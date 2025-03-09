@@ -103,3 +103,7 @@ td::after {
 td.animate-colorAnimation::after {
   animation: colorAnimation 0.3s ease-in-out infinite alternate;
 }
+
+::-webkit-scrollbar{
+  width: 10px;
+}

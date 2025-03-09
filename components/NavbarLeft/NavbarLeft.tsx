@@ -1,28 +1,56 @@
 import React, { useState } from "react";
-import {
-  FaCalendarCheck,
-  FaBullhorn,
-  FaUser,
-  FaUserShield,
-  FaFileAlt,
-  FaChevronDown,
-  FaSignOutAlt, // Icono de cerrar sesión
-} from "react-icons/fa";
-import Link from "next/link";
+import { usePathname } from "next/navigation";
+import NavbarLeftItem from "../NavbarLeftItem/NavbarLeftItem";
+import NavbarLeftGroup from "../NavbarLeftGroup/NavbarLeftGroup";
+import { menuItems } from "./NavbarLetf.data";
+import { Link, LogOut, LogOutIcon } from "lucide-react";
 
 export default function NavbarLeft() {
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useState(true);
+  const [activeGroup, setActiveGroup] = useState<string | null>(null);
+  const pathname = usePathname();
+  const handleLogout = () => {};
 
-  const toggleMenu = (menuName: string) => {
-    setOpenMenu((prevMenu) => (prevMenu === menuName ? null : menuName));
-  };
-
-  const handleLogout = () => {
-    // Aquí puedes agregar la lógica de cierre de sesión
-    console.log("Sesión cerrada");
+  const toggleGroup = (label: string) => {
+    setActiveGroup(activeGroup === label ? null : label);
   };
 
   return (
+    <aside className="fixed top-0 -mt-4  sm:mt-0 left-0 h-[calc(100vh-48px)] w-75 sm:w-72 bg-white text-[#191D23] z-50 shadow-md flex flex-col justify-between overflow-auto">
+      <nav className="p-2">
+        <ul>
+          {menuItems.map((item, index) => (
+            <div key={index}>
+              {item.type === "separator" && isOpen && (
+                <span className="px-4 text-gray-500 text-sm">{item.label}</span>
+              )}
+              {item.type === "item" && (
+                <NavbarLeftItem label={item.label} icon={item.icon} link="" />
+              )}
+              {item.type === "group" && (
+                <NavbarLeftGroup
+                  label={item.label}
+                  icon={item.icon}
+                  items={item.items}
+                />
+              )}
+            </div>
+          ))}
+        </ul>
+      </nav>
+      <div className="py-3 px-2 flex items-center justify-center">
+        <button
+          onClick={handleLogout}
+          className="flex items-center justify-center mb-8 sm:mb-10 lg:mb-16 space-x-2 bg-red-500 text-white p-3 rounded-md hover:bg-red-600 transition duration-300 "
+        >
+          <LogOutIcon className="text-lg" />
+          <span>Cerrar Sesión</span>
+        </button>
+      </div>
+    </aside>
+  );
+
+  /*return (
     <nav className="fixed top-0 -mt-4  sm:mt-0 left-0 h-screen w-75 sm:w-72 bg-white text-[#191D23] p-6 z-50 shadow-md flex flex-col justify-between">
       <div>
         <div className="text-gray-500 text-sm mb-4">Menú</div>
@@ -41,7 +69,6 @@ export default function NavbarLeft() {
             </Link>
           </li>
 
-          {/* Mantenimiento Local */}
           <li
             className="flex items-center space-x-2 text-[13px] sm:text-[16px] font-semibold font-manrope hover:bg-gray-100 p-3 rounded-md cursor-pointer w-full"
             onClick={() => toggleMenu("mantenimiento")}
@@ -75,7 +102,6 @@ export default function NavbarLeft() {
             </ul>
           )}
 
-          {/* Cliente */}
           <li
             className="flex items-center space-x-2 text-[13px] sm:text-[16px] font-semibold font-manrope hover:bg-gray-100 p-3 rounded-md cursor-pointer w-full"
             onClick={() => toggleMenu("cliente")}
@@ -109,7 +135,6 @@ export default function NavbarLeft() {
             </ul>
           )}
 
-          {/* Administradores */}
           <li
             className="flex items-center space-x-2 text-[13px] sm:text-[16px] font-semibold font-manrope hover:bg-gray-100 p-3 rounded-md cursor-pointer w-full"
             onClick={() => toggleMenu("admin")}
@@ -135,7 +160,6 @@ export default function NavbarLeft() {
             </ul>
           )}
 
-          {/* Reportes */}
           <li
             className="flex items-center space-x-2 text-[13px] sm:text-[16px] font-semibold font-manrope hover:bg-gray-100 p-3 rounded-md cursor-pointer w-full"
             onClick={() => toggleMenu("reporte")}
@@ -163,7 +187,6 @@ export default function NavbarLeft() {
         </ul>
       </div>
 
-      {/* Botón de Cerrar Sesión */}
       <Link
       href="/"
 
@@ -174,5 +197,5 @@ export default function NavbarLeft() {
         <span>Cerrar Sesión</span>
       </Link>
     </nav>
-  );
+  );*/
 }
