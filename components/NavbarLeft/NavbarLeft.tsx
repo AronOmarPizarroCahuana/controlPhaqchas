@@ -25,7 +25,7 @@ export default function NavbarLeft() {
                 <span className="px-4 text-gray-500 text-sm">{item.label}</span>
               )}
               {item.type === "item" && (
-                <NavbarLeftItem label={item.label} icon={item.icon} link="" />
+                <NavbarLeftItem label={item.label} icon={item.icon} link={item.link} />
               )}
               {item.type === "group" && (
                 <NavbarLeftGroup

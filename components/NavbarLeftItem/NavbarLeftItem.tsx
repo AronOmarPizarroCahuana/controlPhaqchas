@@ -4,8 +4,8 @@ import React from 'react'
 import { NavbarLeftProps } from './NavbarLeftItem.types';
 
 export default function NavbarLeftItem({icon: Icon, label, link}: NavbarLeftProps) {
-    const pathname = usePathname(); // Obtiene la ruta actual
-  const isActive = pathname === link; // Compara si la ruta es activa
+    const pathname = usePathname(); 
+  const isActive = pathname === link; 
 
   return (
     <li className="w-full p-2">
