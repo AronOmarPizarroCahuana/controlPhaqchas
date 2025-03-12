@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { usePathname } from "next/navigation";
 import { ChevronRight, LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -9,20 +9,25 @@ export type NavbarLeftGroupProps = {
   icon?: LucideIcon;
   label: string;
   items: { label: string; link: string }[];
+  isOpen: boolean;
+  onToggle: () => void;
 };
 
-export default function NavbarLeftGroup({ icon: Icon, label, items }: NavbarLeftGroupProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function NavbarLeftGroup({
+  icon: Icon,
+  label,
+  items,
+  isOpen,
+  onToggle,
+}: NavbarLeftGroupProps) {
   const pathname = usePathname(); // Obtiene la ruta actual
-
-  const toggleGroup = () => setIsOpen(!isOpen);
 
   return (
     <div className="w-full p-2">
       {/* Botón principal del grupo */}
       <span
         className="w-full p-2 flex items-center justify-between py-4 transition-all text-md text-black/70 hover:cursor-pointer hover:text-purple-700 hover:bg-gray-300/80 rounded-lg"
-        onClick={toggleGroup}
+        onClick={onToggle} // Se encarga de manejar el estado desde el padre
       >
         <div className="flex items-center gap-x-4 pl-6">
           {Icon && <Icon size={20} />}

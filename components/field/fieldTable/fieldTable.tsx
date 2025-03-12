@@ -77,7 +77,8 @@ export function PublishedList({ FieldItems }: FieldProps) {
               item.id === updatedItem.id ? updatedItem : item
             )
           );
-          setShowModal(false); // Cerrar el modal después de actualizar
+          console.log(response)
+          setShowModal(false); 
         } else {
           console.error("Error al actualizar el anuncio");
         }

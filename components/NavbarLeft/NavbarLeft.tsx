@@ -11,8 +11,8 @@ export default function NavbarLeft() {
   const pathname = usePathname();
   const handleLogout = () => {};
 
-  const toggleGroup = (label: string) => {
-    setActiveGroup(activeGroup === label ? null : label);
+  const handleToggle = (groupLabel: string) => {
+    setActiveGroup((prev) => (prev === groupLabel ? null : groupLabel));
   };
 
   return (
@@ -32,6 +32,8 @@ export default function NavbarLeft() {
                   label={item.label}
                   icon={item.icon}
                   items={item.items}
+                  isOpen={isOpen && item.label === activeGroup}
+                  onToggle={() => handleToggle(item.label)}
                 />
               )}
             </div>

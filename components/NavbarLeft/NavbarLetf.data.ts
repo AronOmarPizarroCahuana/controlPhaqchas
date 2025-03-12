@@ -60,8 +60,8 @@ export const menuItems: SidebarMenuItem[] = [
     icon: ShieldCheck,
     label: "Roles y permisos",
     items: [
-      { type: "item", label: "Roles", link: "/AdminGestion/roles" },
-      { type: "item", label: "Permisos", link: "/AdminGestion/permisos" }
+      { type: "item", label: "Roles", link: "/AdminGestion/Roles" },
+      { type: "item", label: "Permisos", link: "/AdminGestion/Permisos" }
     ]
   }
 ];
