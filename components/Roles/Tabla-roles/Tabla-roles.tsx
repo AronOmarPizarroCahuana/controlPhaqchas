@@ -22,7 +22,7 @@ export function AdminList({ FieldItems }: FieldProps) {
   const [selectedAdminId, setSelectedAdminId] = useState<number | null>(null);
 
   const openRolesModal = (adminId: number | undefined) => {
-    if (adminId) { 
+    if (adminId) {
       setSelectedAdminId(adminId);
       setIsRolesModalOpen(true);
     }
@@ -156,7 +156,6 @@ export function AdminList({ FieldItems }: FieldProps) {
       });
   };
 
-
   return (
     <>
       {showModal && editAdmin && (
@@ -247,19 +246,25 @@ export function AdminList({ FieldItems }: FieldProps) {
                     {admin.name} {admin.surname}
                   </td>
                   <td className="px-4 py-2 border-b  capitalize">
-                    {admin.roles.map((role) => role.name)}
+                    <div className="flex flex-col  items-start gap-x-1">
+                      {admin.roles.map((role, index) => (
+                        <p key={index}>{role.name}</p>
+                      ))}
+                    </div>
                   </td>
                   <td className="px-4 py-2 border-b text-center">
                     {admin.status === 1 ? "Activo" : "Inactivo"}
                   </td>
                   <td className="px-4 py-2 border-b">
                     <div className="flex items-center gap-x-1">
-                    <button
-                      className="bg-black p-2"
-                      onClick={() => openRolesModal(admin.id ? admin.id : undefined)}
-                    >
-                      <KeySquare className="text-white text-sm" width={22} />
-                    </button>
+                      <button
+                        className="bg-black p-2"
+                        onClick={() =>
+                          openRolesModal(admin.id ? admin.id : undefined)
+                        }
+                      >
+                        <KeySquare className="text-white text-sm" width={22} />
+                      </button>
                       <button
                         onClick={() => handleEdit(admin)}
                         title="Editar"
@@ -277,7 +282,7 @@ export function AdminList({ FieldItems }: FieldProps) {
       </div>
       {isRolesModalOpen && (
         <ModalRoles adminId={selectedAdminId} onClose={closeRolesModal} />
-      ) }
+      )}
     </>
   );
 }
