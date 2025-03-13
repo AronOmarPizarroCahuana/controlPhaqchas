@@ -16,6 +16,15 @@ type WeekStartDates = {
 };
 
 export default function Booking() {
+  const [band, setband] = useState<boolean>(false);
+  const [bookingid, setbookingid] = useState<string >(""); // Guarda la celda cortada
+  const [userid, setuserid] = useState<string >(""); // Guarda la celda cortada
+  const [cutCell, setCutCell] = useState<string | null>(null); // Guarda la celda cortada
+  const [fieldid, setfieldid] = useState<string >(""); // Guarda la celda cortada
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+
+
+
   // Creamos un estado para cada semana, uno por cada campo
   const initialState: WeekStartDates = fields.reduce((acc, field) => {
     acc[field] = startOfWeek(new Date(), { weekStartsOn: 1 });
@@ -91,7 +100,14 @@ export default function Booking() {
 
 
               <TablaTop />
-              <Tabla id={field} field={field} startDate={startDate} endDate={endDate} currentWeekStart={currentWeekStart} />
+              <Tabla id={field} field={field} startDate={startDate} endDate={endDate} currentWeekStart={currentWeekStart} 
+              band={band} setband={setband} 
+              bookingid={bookingid} setbookingid={setbookingid}
+              userid={userid} setuserid={setuserid}
+              cutCell={cutCell} setCutCell={setCutCell}
+              fieldid={fieldid} setfieldid={setfieldid}
+              refreshTrigger={refreshTrigger} setRefreshTrigger={setRefreshTrigger}
+              />
             </div>
             
           );

@@ -54,7 +54,7 @@ export default function ImageLogin() {
           .then((response) => response.json())
           .then((user) => {
             console.log(user)
-            if (user.roles.includes("admin")) {
+           // if (user.roles.includes("admin")) {
               localStorage.setItem("authToken", data.access_token);
               localStorage.setItem("user", JSON.stringify(user));
 
@@ -65,13 +65,13 @@ export default function ImageLogin() {
               });
 
               router.push("/AdminGestion"); 
-            } else {
+          /*  } else {
               Swal.fire({
                 title: "Rechazo del sistema!",
                 text: "Usted no es un administrador",
                 icon: "error",
               });
-            }
+            }*/
           })
           .catch((error) => {
             console.error("Error with PUT request:", error);

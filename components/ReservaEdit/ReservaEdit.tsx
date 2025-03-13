@@ -107,7 +107,7 @@ export default function ReservaM({
             // Obtener la hora actual para determinar si es mañana o tarde
             const newTimeEnd = formatTime(timeEnd);
             const endHour = parseInt(newTimeEnd.split(':')[0], 10);
-            const isMorning = endHour <= 15;
+            const isMorning = endHour <= 16;
     
             // Calcular el precio basado en el horario
             const total1 = isMorning ? selectedSport.price_morning : selectedSport.price_evening;
@@ -139,7 +139,16 @@ export default function ReservaM({
     }
   }, [customers, user_id]);  // Solo se ejecuta cuando cambia el user_id o customers
   
-
+  useEffect(() => {
+    if (sports.length > 0) {
+      const firstSport = sports[0];
+      if (firstSport.id !== undefined) { // Asegurar que id existe
+        setSelectedSportId(firstSport.id);
+        handleSportChange({ target: { value: String(firstSport.id) } } as React.ChangeEvent<HTMLSelectElement>);
+      }
+    }
+  }, [sports]);
+  
   const handlePhoneSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPhoneSearch(value);
@@ -166,7 +175,7 @@ export default function ReservaM({
       // Convierte timeStart a una hora de 24 horas
       const newtimeend=formatTime(timeEnd)
       const endHour = parseInt(newtimeend.split(':')[0], 10);
-      const isMorning = endHour <= 15;  // Consideramos 'mañana' antes de las 15:00
+      const isMorning = endHour <= 16;  // Consideramos 'mañana' antes de las 15:00
       const total1 = isMorning ? selectedSport.price_morning : selectedSport.price_evening;
       setTotal(total1 || 0);
       setPrice(total1 ? total1 - yape : 0);  // Si total1 es válido, calcula price

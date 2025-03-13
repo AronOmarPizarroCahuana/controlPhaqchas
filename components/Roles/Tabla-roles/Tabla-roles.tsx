@@ -47,7 +47,7 @@ export function AdminList({ FieldItems }: FieldProps) {
   useEffect(() => {
     const storedToken = localStorage.getItem("authToken");
     setToken(storedToken);
-    fetch(`${API_URL}/admi`)
+    fetch(`${API_URL}/customer`)
       .then((res) => res.json())
       .then((data) => setAdmins(data.data))
       .catch((err) => console.error("Error fetching admins:", err));
@@ -224,7 +224,6 @@ export function AdminList({ FieldItems }: FieldProps) {
             <tr>
               <th className="px-4 py-2 border-b">DNI</th>
               <th className="px-4 py-2 border-b">Nombre y Apellido</th>
-              <th className="px-4 py-2 border-b">Rol en el Sistema</th>
               <th className="px-4 py-2 border-b">Estado</th>
               <th className="px-4 py-2 border-b">Acciones</th>
             </tr>
@@ -245,13 +244,7 @@ export function AdminList({ FieldItems }: FieldProps) {
                   <td className="px-4 py-2 border-b text-center">
                     {admin.name} {admin.surname}
                   </td>
-                  <td className="px-4 py-2 border-b  capitalize">
-                    <div className="flex flex-col  items-start gap-x-1">
-                      {admin.roles.map((role, index) => (
-                        <p key={index}>{role.name}</p>
-                      ))}
-                    </div>
-                  </td>
+                 
                   <td className="px-4 py-2 border-b text-center">
                     {admin.status === 1 ? "Activo" : "Inactivo"}
                   </td>

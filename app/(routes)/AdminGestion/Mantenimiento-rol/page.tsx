@@ -25,7 +25,7 @@ export default function FormPage() {
   }, []);
 
   useEffect(() => {
-    fetch(`${API_URL}/admi`) 
+    fetch(`${API_URL}/customer`) 
       .then(response => response.json())
       .then(data => {
         if (Array.isArray(data?.data)) { 
@@ -42,7 +42,7 @@ export default function FormPage() {
   }, []);
 
   const fetchAdmins = () => {
-    fetch(`${API_URL}/admi`)
+    fetch(`${API_URL}/customer`)
       .then((response) => response.json())
       .then((data) => {
         if (Array.isArray(data?.data)) {
@@ -58,9 +58,6 @@ export default function FormPage() {
       });
   };
 
-  useEffect(() => {
-    fetchAdmins();
-  }, []);
 
   return (
     <div className="flex flex-col md:flex-row">

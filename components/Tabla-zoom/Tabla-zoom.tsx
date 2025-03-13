@@ -7,6 +7,7 @@ import ReservaM from "../ReservaM/ReservaM";
 import ReservaEdit from "../ReservaEdit/ReservaEdit";
 import {API_URL} from "../../config";
 import { Skeleton } from "@/components/ui/skeleton";
+import Swal from "sweetalert2";
 
 interface TablaProps {
   field: string;
@@ -14,15 +15,22 @@ interface TablaProps {
   startDate: string;
   endDate: string;
   id: string;
+
+  band: boolean;
+  setband: React.Dispatch<React.SetStateAction<boolean>>;
+  bookingid: string ;
+  setbookingid:React.Dispatch<React.SetStateAction<string>>;
+  userid:string;
+  setuserid:React.Dispatch<React.SetStateAction<string>>;
+  cutCell: string | null;
+  setCutCell: React.Dispatch<React.SetStateAction<string | null>>;
+  fieldid:string;
+  setfieldid:React.Dispatch<React.SetStateAction<string>>;
+  refreshTrigger:number;
+  setRefreshTrigger:React.Dispatch<React.SetStateAction<number>>;
 }
 
-export default function Tabla({
-  field,
-  currentWeekStart,
-  startDate,
-  endDate,
-  id,
-}: TablaProps) {
+export default function Tabla({id, field, startDate, endDate, currentWeekStart, band, setband ,bookingid,setbookingid,userid,setuserid,cutCell,setCutCell,fieldid,setfieldid ,refreshTrigger,setRefreshTrigger}: TablaProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalData, setModalData] = useState<{
     timeStart: string;
@@ -49,6 +57,182 @@ export default function Tabla({
 
   const [loading, setLoading] = useState(true);
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  
+
+
+
+
+
+
+  const [isCutting, setIsCutting] = useState(false);
+  const [cutBookingId, setCutBookingId] = useState<string | null>(null); // Guarda el ID de la reserva cortada
+
+  useEffect(() => {
+    console.log("🔄 Tabla recargada por cambio en refreshTrigger");
+    fetchDatos(); // 🔄 Vuelve a obtener los datos
+}, [refreshTrigger]); 
+
+
+  const formatTime = (time: string) => {
+    const date = new Date('1970-01-01 ' + time);  // Usar una fecha arbitraria para convertir la hora
+    return date.toTimeString().substring(0, 5);   // Extraer la hora en formato 24 horas (HH:mm)
+  };
+  
+  
+  const [selectedCellcut, setSelectedCellcut] = useState<{ key: string; status: string; } | null>(null);
+
+  
+
+  const validStatuses = ["reservado", "en espera", "completado"];
+
+  const activateContextMenu = (x: number, y: number, cellKey: string, status: string, id: string, iduser: string) => {
+    if (!validStatuses.includes(status)) return;
+    console.log("bandera cambiada", status);
+
+    setband(true); // 🔹 Activa la bandera para todas las tablas
+  
+    setSelectedCellcut((prev) => {
+      setCutCell(cellKey)
+      setfieldid(field)
+
+      console.log("bandera cambiada", id);
+      setuserid(iduser);
+      setbookingid(id);
+      if (prev?.key === cellKey && prev.status === status) return prev;
+      return { key: cellKey, status };
+    });
+  };
+  
+  // 🔹 Evento para dispositivos táctiles
+  const handleTouchStart = (event: React.TouchEvent, cellKey: string, status: string, id: string, iduser: string) => {
+    const touch = event.touches[0];
+    setTimeout(() => activateContextMenu(touch.clientX, touch.clientY, cellKey, status, id, iduser), 500);
+  };
+  
+  // 🔹 Evento para clic derecho
+  const handleContextMenu = (event: React.MouseEvent, cellKey: string, status: string, id: string, iduser: string) => {
+    event.preventDefault();
+    activateContextMenu(event.clientX, event.clientY, cellKey, status, id, iduser);
+  };
+  
+  useEffect(() => {
+    setfieldid(""); // ✅ Ahora se ejecuta solo después del render
+  }, []);
+
+  const handleCutClick = async (hour_start: string, hour_end: string, targetDay: string ,status:string) => {
+    if(status=="disponible"){
+    const result = await Swal.fire({
+      title: "¿Esta seguro que quiere mover la celda?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar",
+      cancelButtonText: "Cancelar",
+
+    });
+
+    if (result.isConfirmed) {
+    console.log("⏳ Iniciando handleCutClick...")
+    let contador = 0;
+
+
+    //aca la condicion y que la tabla fieldid se reinicie
+  
+setCutCell(null)
+    switch (targetDay) {
+      case "Lunes":
+        contador = 0;
+        break;
+      case "Martes":
+        contador = 1;
+        break;
+      case "Miércoles":
+        contador = 2;
+        break;
+      case "Jueves":
+        contador = 3;
+        break;
+      case "Viernes":
+        contador = 4;
+        break;
+      case "Sábado":
+        contador = 5;
+        break;
+      case "Domingo":
+        contador = 6;
+        break;
+    }
+    const day=days[contador]
+    console.log("📌 Datos recibidos:",status,bookingid,userid,targetDay,  hour_start, hour_end, day.toISOString().split('T')[0]);
+  
+    if (band==false) {
+      console.warn("⚠️ No hay reserva cortada, saliendo...");
+      return;
+    }
+ 
+
+    // Datos para la API
+    const requestData = {
+      start_time: formatTime(hour_start),
+      end_time: formatTime(hour_end),
+      user_id:userid,
+      booking_date: day.toISOString().split('T')[0],
+      field_id: field,
+    };
+  
+    console.log("📤 Enviando datos a la API:", requestData);
+  
+    try {
+      const response = await fetch(`${API_URL}/booking/change/${bookingid}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData),
+      });
+  
+      const responseData = await response.json();
+      console.log("📥 Respuesta de la API:", responseData);
+  
+      if (!response.ok) {
+        throw new Error(`❌ Error en la API: ${response.status} ${response.statusText}`);
+      }
+  
+      console.log("✅ Reserva actualizada exitosamente.");
+      setband(false);
+      setCutBookingId(null);
+      setCutCell(null);
+  
+      console.log("🔄 Refrescando datos...");
+      if (field !== fieldid) {
+        console.log("🔄 Recargando tabla con fieldid:", fieldid);
+        setRefreshTrigger(prev => prev + 1); // 🔄 Fuerza un re-render de la tabla
+    }else{
+      fetchDatos()
+    }
+    } catch (error) {
+      console.error("❌ Error al actualizar la reserva:", error);
+    }
+  }
+  else{
+    setband(false)
+    setCutCell(null)
+  }}else{
+    setband(false)
+    setCutCell(null)
+  }
+  };
+
+
+
+
+
+
+
+
+
+
+
+
   
   const convertTo24HourFormat = (time: string) => {
     const [hour, minutePart] = time.split(':');
@@ -404,9 +588,9 @@ function formatHour(time: string) {
   {days.map((day) => (
     <th
       key={day.toISOString()}
-      className="border w-[15%] text-center font-inter leading-tight bg-[#8D9EC1] text-white text-[5px] custom:text-[6px]  h-auto"
+      className="border w-[15%] text-center font-inter leading-tight bg-[#8D9EC1] text-white text-[6px] custom:text-[7px]  h-auto"
     >
-      <div>{format(day, "eeee", { locale: es })} - {format(day, "d")}</div>
+      <div>{format(day, "eeee", { locale: es })} {format(day, "d")}</div>
     </th>
   ))}
 </tr>
@@ -418,30 +602,54 @@ function formatHour(time: string) {
   <tbody>
     {reservations.map((reservation, index) => (
       <tr key={index} >
-        <td className="rotate-0 border leading-tight h-auto   font-bold font-inter text-center bg-white text-[#454545] text-[4px] custom:text-[5px]">
+        <td className="rotate-0 border leading-tight h-auto   font-bold font-inter text-center bg-white text-[#454545] text-[5px] custom:text-[6px]">
           CAMPO {field}
         </td>
         {reservation.hour_range && (
-          <td className="border text-center text-[6px] leading-tight h-auto  font-semibold font-inter bg-white text-[#454545] custom:text-[7px] w-[15%]"> 
+          <td className="border text-center text-[8px] leading-tight h-auto  font-semibold font-inter bg-white text-[#454545] custom:text-[9px] w-[15%]"> 
             {formatHour(reservation.hour_range.start)} - {formatHour(reservation.hour_range.end)}
           </td>
         )}
         {reservation.days.map((day, dayIndex) => {
           const status = day.status || "disponible";
           const cellKey = `${reservation.hour_range.start}-${reservation.hour_range.end}-${day.day_name}`;
-
+          const idbooking= `${day.booking_details?.id}`;
+          const iduser= `${day.booking_details?.id_user}`;
           return (
             <td
-              key={dayIndex}
-              className={`border  leading-tight h-auto p-[2px] text-[6px] ${getColorClass(status)} 
-                ${animatingCell === cellKey ? 'animate-colorAnimation' : ''} sm:text-xs w-[15%]`}
-              onClick={() => {
-                const selectedDay = reservation.days.find(d => d.day_name === day.day_name);
-                if (selectedDay) {
-                  handleCellClick(reservation.hour_range.start, reservation.hour_range.end, day.day_name, selectedDay, status);
-                }
-              }}
-            >
+            key={dayIndex}
+            onContextMenu={(e) => handleContextMenu(e, cellKey, status,idbooking,iduser)} // Convertir a string
+            onTouchStart={(e) => handleTouchStart(e, cellKey, status,idbooking,iduser)}
+            onClick={() => {
+              console.log("Click en celda:", cellKey);
+              console.log("Estado actual - isCutting:", isCutting, "cutCell:", cutCell);
+              console.log("bandera:",band);
+              if (band==true) {
+                console.log("Ejecutando handleCutClick para:", bookingid, "en celda:", cellKey);
+                handleCutClick(reservation.hour_range.start,reservation.hour_range.end,day.day_name,day.status);
+                setband(false); // Restablecer para permitir abrir el modal en el siguiente clic
+                return; // Evita que se ejecute el código del modal
+              }
+             else{
+              const selectedDay = reservation.days.find(d => d.day_name === day.day_name);
+              if (selectedDay) {
+                console.log("Ejecutando handleCellClick, abriendo modal");
+                handleCellClick(
+                  reservation.hour_range.start,
+                  reservation.hour_range.end,
+                  day.day_name,
+                  selectedDay,
+                  status
+                );
+              }
+            }
+          }}
+            className={`border  leading-tight h-auto py-1 px-1 text-[8px] ${getColorClass(status)} 
+              ${animatingCell === cellKey ? 'animate-colorAnimation' : ''} 
+              ${(cutCell === cellKey && field === fieldid) ? "relative z-auto border-2 border-dashed border-blue-900 bg-[rgba(0,0,0,0.58)]" : ""}
+
+            `}
+          >
               {day.booking_details ? (
                 <div className="flex justify-between items-center w-full">
                   {/* Show booking details */}

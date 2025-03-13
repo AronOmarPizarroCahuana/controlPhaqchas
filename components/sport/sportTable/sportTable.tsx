@@ -34,9 +34,9 @@ export function PublishedList({ publishedItems }: PublishedListProps) {
     })
       .then((response) => {
         if (response.ok) {
-          setItems(items.filter((item) => item.id !== id)); // Eliminar el anuncio de la lista
+          setItems(items.filter((item) => item.id !== id));
         } else {
-          console.error("Error al eliminar el anuncio");
+          console.error("Error al eliminar el deporte");
         }
       })
       .catch((error) => console.error("Error al realizar la solicitud DELETE:", error));
@@ -174,7 +174,7 @@ export function PublishedList({ publishedItems }: PublishedListProps) {
                 <td className="px-4 py-2 border-b text-center">
                   {item.image ? (
                     <Image
-                      src={`${API_URL_BASE}/public${item.image}`}
+                      src={`${API_URL_BASE}/${item.image}`}
                       alt={item.name || "Imagen del anuncio"}
                       width={50}
                       height={30}

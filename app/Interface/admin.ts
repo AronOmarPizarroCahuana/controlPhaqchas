@@ -7,5 +7,4 @@ export interface Admin {
     address: string;
     status: number;
     birth_date: string;
-    roles: { name: string}[];
   }

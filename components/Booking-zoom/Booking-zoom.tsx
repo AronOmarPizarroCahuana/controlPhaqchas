@@ -10,6 +10,15 @@ const fields = ['1', '2', '3', '4'] as const;
 
 export default function Booking() {
   // Un único estado para manejar la semana de todas las canchas
+  const [band, setband] = useState<boolean>(false);
+  const [bookingid, setbookingid] = useState<string >(""); // Guarda la celda cortada
+  const [userid, setuserid] = useState<string >(""); // Guarda la celda cortada
+  const [cutCell, setCutCell] = useState<string | null>(null); // Guarda la celda cortada
+  const [fieldid, setfieldid] = useState<string >(""); // Guarda la celda cortada
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+
+
+
   const [currentWeekStart, setCurrentWeekStart] = useState(
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
@@ -73,7 +82,14 @@ export default function Booking() {
 
       <div className="mt-4">
         {fields.map((field) => (
-          <Tabla key={field} id={field} field={field} startDate={startDate} endDate={endDate} currentWeekStart={currentWeekStart} />
+          <Tabla key={field} id={field} field={field} startDate={startDate} endDate={endDate} currentWeekStart={currentWeekStart}
+              band={band} setband={setband} 
+              bookingid={bookingid} setbookingid={setbookingid}
+              userid={userid} setuserid={setuserid}
+              cutCell={cutCell} setCutCell={setCutCell}
+              fieldid={fieldid} setfieldid={setfieldid}
+              refreshTrigger={refreshTrigger} setRefreshTrigger={setRefreshTrigger}
+          />
         ))}
       </div>
     </div>
