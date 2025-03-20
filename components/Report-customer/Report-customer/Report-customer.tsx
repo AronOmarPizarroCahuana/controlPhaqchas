@@ -13,25 +13,32 @@ export default function TopCustomers() {
   const [startMonth, setStartMonth] = useState('01');
   const [endMonth, setEndMonth] = useState('01');
   const [year, setYear] = useState('2025');
-
+/*
   useEffect(() => {
     fetchCustomers();
   }, [startMonth, endMonth, year]);
-
+*/
   const fetchCustomers = async () => {
     if (parseInt(startMonth) > parseInt(endMonth)) return;
+    
     const startDate = `${year}-${startMonth}-01`;
     const endDate = `${year}-${endMonth}-30`;
+  
     try {
-      const response = await fetch(
-        `${API_URL}/topCustomers/${startDate}/${endDate}`
-      );
+      const response = await fetch(`${API_URL}/topCustomers/${startDate}/${endDate}`);
       const data = await response.json();
-      setCustomers(data.data);
+      
+      if (Array.isArray(data.data)) {
+        setCustomers(data.data);
+      } else {
+        setCustomers([]); 
+      }
     } catch (error) {
       console.error('Error fetching customers:', error);
+      setCustomers([]);
     }
   };
+  
 
   const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setter(e.target.value);
@@ -68,7 +75,7 @@ export default function TopCustomers() {
       </div>
 
       <div className="flex gap-4 justify-center flex-wrap sm:flex-nowrap">
-        {customers.slice(0, 5).map((customer, index) => (
+      {(customers?.slice?.(0, 5) || []).map((customer, index) => (
           <div key={customer.id} className="relative mb-4 sm:mb-0">
             <div
               className={`w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center rounded-full text-white font-bold transition-transform duration-300 relative ${medalStyles[index]}`}

@@ -95,7 +95,7 @@ export default function ClientTable() {
               filteredData.map(client => (
                 <tr key={client.id} className="border-b">
                   <td className="p-2 flex items-center space-x-2">
-                    <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white font-bold bg-[#776321]">
+                    <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white font-bold bg-[#d156d1]">
                       {client.name.charAt(0)}{client.surname.charAt(0)}
                     </div>
                     <div>

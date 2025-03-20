@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { format, addDays } from "date-fns";
 import { es } from "date-fns/locale";
-import { Reservation, Day,BookingDetails ,HourRange} from './Reservation';
+import { Reservation, Day} from './Reservation';
 import { Table } from '@/components/ui/table';
 import ReservaM from "../ReservaM/ReservaM";
 import ReservaEdit from "../ReservaEdit/ReservaEdit";
@@ -16,7 +16,6 @@ interface TablaProps {
   startDate: string;
   endDate: string;
   currentWeekStart: Date;
-
   band: boolean;
   setband: React.Dispatch<React.SetStateAction<boolean>>;
   bookingid: string ;
@@ -29,11 +28,9 @@ interface TablaProps {
   setfieldid:React.Dispatch<React.SetStateAction<string>>;
   refreshTrigger:number;
   setRefreshTrigger:React.Dispatch<React.SetStateAction<number>>;
-
 }
 
 export default function Tabla({ id, field, startDate, endDate, currentWeekStart, band, setband ,bookingid,setbookingid,userid,setuserid,cutCell,setCutCell,fieldid,setfieldid ,refreshTrigger,setRefreshTrigger}: TablaProps) {
-  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalData, setModalData] = useState<{
     timeStart: string;
@@ -64,21 +61,7 @@ export default function Tabla({ id, field, startDate, endDate, currentWeekStart,
   const [animatingCell, setAnimatingCell] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [isCutting, setIsCutting] = useState(false);
-  const [cutBookingId, setCutBookingId] = useState<string | null>(null); // Guarda el ID de la reserva cortada
-
-  useEffect(() => {
-    console.log("🔄 Tabla recargada por cambio en refreshTrigger");
-    fetchDatos(); // 🔄 Vuelve a obtener los datos
-}, [refreshTrigger]); 
-
-useEffect(() => {
-  setfieldid(""); // ✅ Ahora se ejecuta solo después del render
-}, []);
-
-useEffect(() => {
-  setIsClient(true);
-}, []);
+  //const [cutBookingId, setCutBookingId] = useState<string | null>(null); // Guarda el ID de la reserva cortada
 
   const formatTime = (time: string) => {
     const date = new Date('1970-01-01 ' + time);  // Usar una fecha arbitraria para convertir la hora
@@ -87,37 +70,58 @@ useEffect(() => {
   
   
   const [selectedCellcut, setSelectedCellcut] = useState<{ key: string; status: string; } | null>(null);
-  const [isClient, setIsClient] = useState(false);
+  //const [isClient, setIsClient] = useState(false);
 
  
   const validStatuses = ["reservado", "en espera", "completado"];
 
+  let touchTimeout: NodeJS.Timeout | null = null;
+
   const activateContextMenu = (x: number, y: number, cellKey: string, status: string, id: string, iduser: string) => {
     if (!validStatuses.includes(status)) return;
   
-    setband(true);
+    setband((prev) => {
+      console.log("bandera cortar 3 antes de cambiar:", prev);
+      return true;
+    });
+  
     setCutCell(cellKey);
     setfieldid(field);
     setuserid(iduser);
     setbookingid(id);
   
-    setSelectedCellcut((prev) => (prev?.key === cellKey && prev.status === status ? prev : { key: cellKey, status }));
+    setSelectedCellcut((prev) =>
+      prev?.key === cellKey && prev.status === status ? prev : { key: cellKey, status }
+    );
+  
+    setTimeout(() => {
+      setband((prev) => {
+        console.log("bandera cortar 3 actualizada:", prev);
+        return prev;
+      });
+    }, 0);
   };
   
-  
-  // 🔹 Evento para dispositivos táctiles
   const handleTouchStart = (event: React.TouchEvent, cellKey: string, status: string, id: string, iduser: string) => {
     const touch = event.touches[0];
-    setTimeout(() => activateContextMenu(touch.clientX, touch.clientY, cellKey, status, id, iduser), 500);
+  
+    touchTimeout = setTimeout(() => {
+      activateContextMenu(touch.clientX, touch.clientY, cellKey, status, id, iduser);
+    }, 1000);
   };
   
-  // 🔹 Evento para clic derecho
+  const handleTouchEnd = () => {
+    if (touchTimeout) {
+      clearTimeout(touchTimeout);
+      touchTimeout = null;
+    }
+  };
+  
   const handleContextMenu = (event: React.MouseEvent, cellKey: string, status: string, id: string, iduser: string) => {
     event.preventDefault();
     activateContextMenu(event.clientX, event.clientY, cellKey, status, id, iduser);
   };
   
-
 
   const handleCutClick = async (hour_start: string, hour_end: string, targetDay: string ,status:string) => {
     if(status=="disponible"){
@@ -133,7 +137,7 @@ useEffect(() => {
     });
 
     if (result.isConfirmed) {
-    console.log("⏳ Iniciando handleCutClick...")
+    //console.log("⏳ Iniciando handleCutClick...")
     let contador = 0;
 
 
@@ -198,10 +202,11 @@ setCutCell(null)
       }
   
       console.log("✅ Reserva actualizada exitosamente.");
-      setband(false);
-      setCutBookingId(null);
       setCutCell(null);
-  
+      setband((prev) => {
+        console.log("bandera cortar 4", prev); // ✅ Esto imprimirá el valor antes de cambiarlo
+        return false;
+      });
       console.log("🔄 Refrescando datos...");
       if (field !== fieldid) {
         console.log("🔄 Recargando tabla con fieldid:", fieldid);
@@ -215,9 +220,13 @@ setCutCell(null)
   }
   else{
     setband(false)
+    console.log("bandera cortar 5",band)
+
     setCutCell(null)
   }}else{
     setband(false)
+    console.log("bandera cortar 6",band)
+
     setCutCell(null)
   }
   };
@@ -430,12 +439,12 @@ console.log(err)
    // console.log("✅ La tabla se ha actualizado correctamente.");
     handleCloseModal();
 };
+/*
 
-// 🔄 Verifica si el estado se está actualizando correctamente
 useEffect(() => {
    // console.log("🔄 Estado actualizado:", reservations);
 }, [reservations]);
-
+*/
 
 const handleSaveReservationE = async (data: { 
    user_id: string;
@@ -454,10 +463,8 @@ const handleSaveReservationE = async (data: {
     return;
   }
 
-  // Convertir la hora a formato de 24 horas
   const formattedStartTime = convertTo24HourFormat(timeStart);
 
-  // ✅ Actualiza las reservas clonando los datos
   setReservations((prev) => {
     const updatedReservationsE = prev.map((reservation) => {
       if (reservation.hour_range?.start === formattedStartTime) {
@@ -496,10 +503,11 @@ const handleSaveReservationE = async (data: {
 };
 
 // 🔄 Verifica si el estado se está actualizando correctamente
+/*
 useEffect(() => {
    console.log("🔄 Estado actualizado: ","campo"+field, reservations);
 }, [reservations]);
-
+*/
 
   
 
@@ -522,62 +530,19 @@ useEffect(() => {
   if (loading ) 
    {
     return  <div>
-    <Table className="table-fixed w-full text-sm border-separate min-w-[1500px]">
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[5%]">&nbsp;</TableHead>
-          <TableHead className="border p-3 w-[10%]">
-            {isClient && <Skeleton className="h-4 w-16" />}
-          </TableHead>
-          {[...Array(7)].map((_, index) => (
-            <TableHead key={`header-${index}`} className="border p-3 text-center">
-              {isClient && (
-                <>
-                  <Skeleton className="h-4 w-20 mx-auto" />
-                  <Skeleton className="h-3 w-10 mx-auto mt-1" />
-                </>
-              )}
-            </TableHead>
-          ))}
-        </TableRow>
+ <Table className="table-fixed w-full text-sm border-separate min-w-[1500px]">
+  <TableBody>
+    {Array.from({ length: 11 }).map((_, index) => (
+      <TableRow key={index}>
+        <TableCell className="border p-4 text-center" colSpan={9}>
+          <Skeleton className="h-6 w-full mx-auto" />
+        </TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
 
-        <TableRow>
-          <TableHead className="w-[5%]">&nbsp;</TableHead>
-          <TableHead className="w-[5%]">
-            {isClient && <Skeleton className="h-4 w-16" />}
-          </TableHead>
-          {[...Array(7)].map((_, index) => (
-            <TableHead key={`subheader-${index}`} className="border px-4 py-2 text-xs">
-              {isClient && (
-                <div className="flex justify-between items-center w-full">
-                  <Skeleton className="h-3 w-12" />
-                  <Skeleton className="h-3 w-10" />
-                  <Skeleton className="h-3 w-8" />
-                </div>
-              )}
-            </TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
 
-      <TableBody>
-        {[...Array(12)].map((_, rowIndex) => (
-          <TableRow key={`row-${rowIndex}`}>
-            <TableCell className="border text-center">
-              {isClient && <Skeleton className="h-4 w-20 mx-auto" />}
-            </TableCell>
-            <TableCell className="border text-center">
-              {isClient && <Skeleton className="h-4 w-24 mx-auto" />}
-            </TableCell>
-            {[...Array(7)].map((_, cellIndex) => (
-              <TableCell key={`cell-${rowIndex}-${cellIndex}`} className="border px-4 py-2 text-xs text-center">
-                {isClient && <Skeleton className="h-6 w-full" />}
-              </TableCell>
-            ))}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
   </div>
    }
   
@@ -632,15 +597,16 @@ useEffect(() => {
                   <td
                   key={dayIndex}
                   onContextMenu={(e) => handleContextMenu(e, cellKey, status,idbooking,iduser)} // Convertir a string
+                  onTouchEnd={handleTouchEnd} // Aquí cancelamos si suelta antes de 2 segundos
+
                   onTouchStart={(e) => handleTouchStart(e, cellKey, status,idbooking,iduser)}
                   onClick={() => {
                     console.log("Click en celda:", cellKey);
-                    console.log("Estado actual - isCutting:", isCutting, "cutCell:", cutCell);
-                    console.log("bandera:",band);
+                    console.log("bandera cortar 1",band);
                     if (band==true) {
                       console.log("Ejecutando handleCutClick para:", bookingid, "en celda:", cellKey);
                       handleCutClick(reservation.hour_range.start,reservation.hour_range.end,day.day_name,day.status);
-                      setband(false); // Restablecer para permitir abrir el modal en el siguiente clic
+                      console.log("bandera cortar 2",band)
                       return; // Evita que se ejecute el código del modal
                     }
                    else{
@@ -723,7 +689,6 @@ useEffect(() => {
 
 
 
-      {/* Cerrar menú cuando se hace clic fuera */}
 
     </div>
   );

@@ -111,7 +111,7 @@ const AddCustomerModal: React.FC<CustomerFormProps> = ({ isOpen, onClose, onAddC
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 h-8 lg:h-10 :w-full  block p-2 border border-gray-300 rounded-md"
+              className="mt-1 h-8 lg:h-10 lg:w-full  block p-2 border border-gray-300 rounded-md"
             />
             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
           </div>
@@ -186,19 +186,7 @@ const AddCustomerModal: React.FC<CustomerFormProps> = ({ isOpen, onClose, onAddC
             {errors.birthdate && <p className="text-red-500 text-sm mt-1">{errors.birthdate}</p>}
           </div>
 
-          <div className="mb-1 lg:mb-4">
-            <label htmlFor="password" className="block lg:text-sm text-[12px] font-medium text-gray-700">
-              Contraseña
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block h-8 lg:h-10 lg:w-full p-2 border border-gray-300 rounded-md"
-            />
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
-          </div>
+        
 
           <div className="mb-1 lg:mb-4 mt-3 lg:mt-6"> 
           <button

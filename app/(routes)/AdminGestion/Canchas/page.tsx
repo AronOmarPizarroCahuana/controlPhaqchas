@@ -99,7 +99,7 @@ export default function FormPage() {
 
       <div className="w-full md:w-1/2 p-4 border-t md:border-l md:border-t-0 border-gray-300">
   <div className="overflow-x-auto max-h-[calc(100vh-250px)] md:max-h-[calc(100vh-200px)]"> 
-    <PublishedList FieldItems={publishedItems} />
+    <PublishedList FieldItems={publishedItems}  reloadAnnouncements={reloadAnnouncements}  />
   </div>
 </div>
 

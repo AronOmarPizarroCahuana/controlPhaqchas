@@ -5,20 +5,76 @@ import { Dialog } from "@/components/ui/dialog"; // Usamos Dialog de shadcn
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import {API_URL} from "../../../config";
+import {API_URL_BASE} from "../../../config";
+import { Label } from "@/components/ui/label";
 
 interface FieldProps {
     FieldItems: Field[];
 }
-
-export function PublishedList({ FieldItems }: FieldProps) {
-  const [items, setItems] = useState<Field[]>(FieldItems);
+interface AnnouncementFormProps {
+  reloadAnnouncements: () => void; 
+}
+export function PublishedList({ FieldItems,reloadAnnouncements }: FieldProps & AnnouncementFormProps) {
+ // const [items, setItems] = useState<Field[]>(FieldItems);
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState<Field | null>(null);
-
+  const [selectedItem, setSelectedItem] = useState<Field | null>(null);
+  const [newImage, setNewImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+/*
   useEffect(() => {
     setItems(FieldItems);
-  }, [FieldItems]);
+  }, [FieldItems]);*/
+  
+  const handleImageClick = (item: Field) => {
+    setSelectedItem(item);
+    setPreview(`${API_URL_BASE}/${item.image}`);
+  };
 
+  const handleCancel = () => {
+    setSelectedItem(null);
+    setNewImage(null);
+    setPreview(null);
+  };
+
+  const handleSave = async () => {
+    if (!selectedItem || !newImage) return;
+  
+    const formData = new FormData();
+    formData.append("image", newImage);
+  
+    try {
+      const response = await fetch(`${API_URL}/field/updateImage/${selectedItem.id}`, {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (!response.ok) throw new Error("Error al actualizar la imagen");
+  
+      // Recargar la tabla de anuncios
+      reloadAnnouncements(); // Llamar a la función que recarga la tabla de anuncios
+  
+      // Limpiar los datos del formulario
+      setSelectedItem(null);
+      setNewImage(null);
+      setPreview(null);
+  
+      alert("Imagen actualizada correctamente");
+    } catch (error) {
+      console.error("Error al actualizar la imagen:", error);
+      
+      alert("Ocurrió un error al actualizar la imagen.");
+    }
+  };
+
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setNewImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
   const handleStatusToggle = async (id: string | undefined) => {
     if (!id) return;
 
@@ -29,11 +85,8 @@ export function PublishedList({ FieldItems }: FieldProps) {
 
       if (!response.ok) throw new Error("Error al actualizar el estado");
 
-      setItems((prevItems) =>
-        prevItems.map((item) =>
-          item.id === id ? { ...item, status: !item.status } : item
-        )
-      );
+      reloadAnnouncements();
+      
     } catch (error) {
       console.error("Error al actualizar el estado:", error);
     }
@@ -52,8 +105,8 @@ export function PublishedList({ FieldItems }: FieldProps) {
     })
       .then((response) => {
         if (response.ok) {
-          setItems(items.filter((item) => item.id !== id)); // Eliminar el anuncio de la lista
-        } else {
+          reloadAnnouncements()        }
+           else {
           console.error("Error al eliminar el anuncio");
         }
       })
@@ -72,11 +125,7 @@ export function PublishedList({ FieldItems }: FieldProps) {
     })
       .then((response) => {
         if (response.ok) {
-          setItems(
-            items.map((item) =>
-              item.id === updatedItem.id ? updatedItem : item
-            )
-          );
+          reloadAnnouncements()
           console.log(response)
           setShowModal(false); 
         } else {
@@ -157,12 +206,12 @@ export function PublishedList({ FieldItems }: FieldProps) {
             </tr>
           </thead>
           <tbody className="text-sm text-gray-700">
-            {items.map((item) => (
-              <tr key={`${item.id}-${item.name}`} className="hover:bg-gray-50">
-               <td className="px-4 py-2 border-b text-center flex items-center space-x-2">
+            {FieldItems.map((item) => (
+              <tr key={`${item.id}-${item.name}`} className="hover:bg-gray-50 border-b">
+               <td className="px-4 py-2  text-center flex items-center space-x-2" onClick={() => handleImageClick(item)}>
                     {item.image ? (
                         <Image
-                        src={`https://api.dev.phaqchas.com/public${item.image}`}
+                        src={`${API_URL_BASE}/${item.image}`}
                         alt={item.name || "Imagen del anuncio"}
                         width={50}
                         height={30}
@@ -174,8 +223,8 @@ export function PublishedList({ FieldItems }: FieldProps) {
                     <span>{item.name}</span>
                     </td>
 
-                <td className="px-4 py-2 border-b text-center">{item.description}</td>
-                <td className="px-4 py-2 border-b text-center">
+                <td className="px-4 py-2  text-center">{item.description}</td>
+                <td className="px-4 py-2  text-center">
                   <Button
                     className={`px-4 py-2 rounded text-white ${item.status ? "bg-green-400" : "bg-gray-400"}`}
                     onClick={() => handleStatusToggle(item.id)}
@@ -183,7 +232,7 @@ export function PublishedList({ FieldItems }: FieldProps) {
                     {item.status ? "Activo" : "Inactivo"}
                   </Button>
                 </td>
-                <td className="px-4 py-2 border-b text-center">
+                <td className="px-4 py-2  text-center">
                   <button onClick={() => handleEdit(item)} title="Editar">
                     <FaEdit className="text-blue-500 hover:text-blue-700" />
                   </button>
@@ -195,6 +244,41 @@ export function PublishedList({ FieldItems }: FieldProps) {
             ))}
           </tbody>
         </table>
+
+        {selectedItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center  justify-center z-50">
+          <div className="bg-white p-6 rounded-lg  shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4 text-center">Editar Imagen</h2>
+
+            <Label className="block text-sm font-medium mb-2">Subir Imagen</Label>
+            <div
+              className="w-full h-40 p-4 border border-gray-300 rounded-lg flex items-center justify-center cursor-pointer bg-gray-100"
+              onClick={() => document.getElementById("fileInput2")?.click()}
+            >
+              <input
+                id="fileInput2"
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+              {preview ? (
+                <Image src={preview} alt="Preview" width={80} height={80} className="rounded" />
+              ) : (
+                <p className="text-gray-500">Haz clic para subir una imagen</p>
+              )}
+            </div>
+
+            <div className="flex justify-end mt-4 space-x-2">
+              <Button variant="outline" onClick={handleCancel}>Cancelar</Button>
+              <Button onClick={handleSave} disabled={!newImage}>Aceptar</Button>
+            </div>
+          </div>
+        </div>
+      )}
+   
+
+
       </div>
     </>
   );

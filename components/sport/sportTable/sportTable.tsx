@@ -1,25 +1,78 @@
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import { Sport } from "@/app/Interface/sport";
 import { FaTrashAlt, FaEdit } from "react-icons/fa";
 import { Dialog } from "@/components/ui/dialog"; // Usamos Dialog de shadcn
 import Image from "next/image";
 import {API_URL} from "../../../config";
 import {API_URL_BASE} from "../../../config";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 interface PublishedListProps {
   publishedItems: Sport[];
 }
-
-export function PublishedList({ publishedItems }: PublishedListProps) {
-  const [items, setItems] = useState<Sport[]>(publishedItems);
+interface AnnouncementFormProps {
+  reloadAnnouncements: () => void; 
+}
+export function PublishedList({ publishedItems ,reloadAnnouncements}: PublishedListProps & AnnouncementFormProps) {
+  //const [items, setItems] = useState<Sport[]>(publishedItems);
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState<Sport | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Sport | null>(null);
+  const [newImage, setNewImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
-  useEffect(() => {
+/*  useEffect(() => {
     setItems(publishedItems);
-  }, [publishedItems]);
+  }, [publishedItems]);*/
 
- 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setNewImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+
+  const handleSave = async () => {
+    if (!selectedItem || !newImage) return;
+  
+    const formData = new FormData();
+    formData.append("image", newImage);
+  
+    try {
+      const response = await fetch(`${API_URL}/sport/updateImage/${selectedItem.id}`, {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (!response.ok) throw new Error("Error al actualizar la imagen");
+  
+      // Recargar la tabla de anuncios
+      reloadAnnouncements(); // Llamar a la función que recarga la tabla de anuncios
+  
+      // Limpiar los datos del formulario
+      setSelectedItem(null);
+      setNewImage(null);
+      setPreview(null);
+  
+      alert("Imagen actualizada correctamente");
+    } catch (error) {
+      console.error("Error al actualizar la imagen:", error);
+      
+      alert("Ocurrió un error al actualizar la imagen.");
+    }
+  };
+
+
+
+  const handleCancel = () => {
+    setSelectedItem(null);
+    setNewImage(null);
+    setPreview(null);
+  };
+
 
   const handleEdit = (item: Sport) => {
     setEditItem(item); // Establecer el ítem a editar
@@ -34,7 +87,7 @@ export function PublishedList({ publishedItems }: PublishedListProps) {
     })
       .then((response) => {
         if (response.ok) {
-          setItems(items.filter((item) => item.id !== id));
+          reloadAnnouncements();
         } else {
           console.error("Error al eliminar el deporte");
         }
@@ -42,7 +95,10 @@ export function PublishedList({ publishedItems }: PublishedListProps) {
       .catch((error) => console.error("Error al realizar la solicitud DELETE:", error));
   };
 
-  
+  const handleImageClick = (item: Sport) => {
+    setSelectedItem(item);
+    setPreview(`${API_URL_BASE}/${item.image}`);
+  };
 
   const handleSubmit = (updatedItem: Sport) => {
     fetch(`${API_URL}/sport/${updatedItem.id}`, {
@@ -54,11 +110,8 @@ export function PublishedList({ publishedItems }: PublishedListProps) {
     })
       .then((response) => {
         if (response.ok) {
-          setItems(
-            items.map((item) =>
-              item.id === updatedItem.id ? updatedItem : item
-            )
-          );
+          reloadAnnouncements();
+          console.log(updatedItem)
           setShowModal(false); // Cerrar el modal después de actualizar
         } else {
           console.error("Error al actualizar el anuncio");
@@ -169,9 +222,9 @@ export function PublishedList({ publishedItems }: PublishedListProps) {
             </tr>
           </thead>
           <tbody className="text-sm text-gray-700">
-            {items.map((item) => (
+            {publishedItems.map((item) => (
               <tr key={`${item.id}-${item.name}`} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border-b text-center">
+                <td className="px-4 py-2 border-b text-center"  onClick={() => handleImageClick(item)}>
                   {item.image ? (
                     <Image
                       src={`${API_URL_BASE}/${item.image}`}
@@ -202,6 +255,41 @@ export function PublishedList({ publishedItems }: PublishedListProps) {
             ))}
           </tbody>
         </table>
+
+        
+        {selectedItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center  justify-center z-50">
+          <div className="bg-white p-6 rounded-lg  shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4 text-center">Editar Imagen</h2>
+
+            <Label className="block text-sm font-medium mb-2">Subir Imagen</Label>
+            <div
+              className="w-full h-40 p-4 border border-gray-300 rounded-lg flex items-center justify-center cursor-pointer bg-gray-100"
+              onClick={() => document.getElementById("fileInput2")?.click()}
+            >
+              <input
+                id="fileInput2"
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+              {preview ? (
+                <Image src={preview} alt="Preview" width={80} height={80} className="rounded" />
+              ) : (
+                <p className="text-gray-500">Haz clic para subir una imagen</p>
+              )}
+            </div>
+
+            <div className="flex justify-end mt-4 space-x-2">
+              <Button variant="outline" onClick={handleCancel}>Cancelar</Button>
+              <Button onClick={handleSave} disabled={!newImage}>Aceptar</Button>
+            </div>
+          </div>
+        </div>
+      )}
+   
+
       </div>
     </>
   );

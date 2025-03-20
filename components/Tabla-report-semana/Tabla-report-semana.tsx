@@ -87,8 +87,6 @@ switch (day) {
     }
   };
   
-  
-  
 
   const handleCloseModal = () => {
     setIsModalOpen(false);

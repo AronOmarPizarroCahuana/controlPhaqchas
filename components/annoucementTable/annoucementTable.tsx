@@ -17,19 +17,14 @@ interface AnnouncementFormProps {
 
 
 export function PublishedList({ publishedItems, reloadAnnouncements }: PublishedListProps & AnnouncementFormProps) {
-  const [items, setItems] = useState<PublishedItem[]>(publishedItems);
+  //const [items, setItems] = useState<PublishedItem[]>(publishedItems);
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState<PublishedItem | null>(null);
   const [selectedItem, setSelectedItem] = useState<PublishedItem | null>(null);
   const [newImage, setNewImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
-  useEffect(() => {
-    setItems(publishedItems);
-  }, [publishedItems]);
-
  
-
 
   // 🖼️ Abrir el modal al hacer clic en la imagen
   const handleImageClick = (item: PublishedItem) => {
@@ -94,55 +89,54 @@ export function PublishedList({ publishedItems, reloadAnnouncements }: Published
 
   const handleDelete = (id: string | undefined) => {
     if (!id) return; 
-
+  
     fetch(`${API_URL}/announcement/${id}`, {
       method: "DELETE",
     })
       .then((response) => {
         if (response.ok) {
-          setItems(items.filter((item) => item.id !== id)); // Eliminar el anuncio de la lista
+          console.log("Eliminación exitosa", response);
+          reloadAnnouncements(); // 🔄 Recargar la tabla con los datos actualizados
         } else {
           console.error("Error al eliminar el anuncio");
         }
       })
       .catch((error) => console.error("Error al realizar la solicitud DELETE:", error));
   };
-
+  
   const handleStatusToggle = async (id: string | undefined) => {
     if (!id) return;
-
+  
     try {
       const response = await fetch(`${API_URL}/announcement/updateStatus/${id}`, {
         method: "GET",
       });
-
+  
       if (!response.ok) throw new Error("Error al actualizar el estado");
-
-      setItems((prevItems) =>
-        prevItems.map((item) =>
-          item.id === id ? { ...item, status: !item.status } : item
-        )
-      );
+  
+      console.log("Estado actualizado con éxito");
+      reloadAnnouncements(); // 🔄 Recargar la lista desde la API
     } catch (error) {
       console.error("Error al actualizar el estado:", error);
     }
   };
+  
 
   const handleSubmit = (updatedItem: PublishedItem) => {
     fetch(`${API_URL}/announcement/${updatedItem.id}`, {
-      method: "PUT", 
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(updatedItem),
+      body: JSON.stringify({
+        title: updatedItem.title,
+        description: updatedItem.description,
+      }),
     })
       .then((response) => {
         if (response.ok) {
-          setItems(
-            items.map((item) =>
-              item.id === updatedItem.id ? updatedItem : item
-            )
-          );
+          console.log("Actualización exitosa", response);
+          reloadAnnouncements(); // 🔄 Recargar la tabla con los datos actualizados
           setShowModal(false); // Cerrar el modal después de actualizar
         } else {
           console.error("Error al actualizar el anuncio");
@@ -150,6 +144,7 @@ export function PublishedList({ publishedItems, reloadAnnouncements }: Published
       })
       .catch((error) => console.error("Error al realizar la solicitud PUT:", error));
   };
+  
 
   return (
     <>
@@ -161,9 +156,7 @@ export function PublishedList({ publishedItems, reloadAnnouncements }: Published
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (editItem) {
             handleSubmit(editItem);
-          }
         }}
       >
         <div className="mb-4">
@@ -188,7 +181,7 @@ export function PublishedList({ publishedItems, reloadAnnouncements }: Published
         <div className="flex justify-between py-3">
           <button
             type="submit"
-            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+            className="bg-[#E1BC00] text-white py-2 px-4 rounded-md hover:bg-[#695e1f] focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
           >
             Guardar
           </button>
@@ -210,7 +203,6 @@ export function PublishedList({ publishedItems, reloadAnnouncements }: Published
    
       )}
 
-      {/* Tabla */}
       <div className="">
         <table className="min-w-full table-auto border-collapse bg-white rounded-lg shadow-md">
           <thead className="bg-gray-100 text-sm text-gray-600">
@@ -223,7 +215,7 @@ export function PublishedList({ publishedItems, reloadAnnouncements }: Published
             </tr>
           </thead>
           <tbody className="text-sm text-gray-700">
-            {items.map((item) => (
+            {publishedItems.map((item) => (
               <tr key={`${item.id}-${item.title}`} className="hover:bg-gray-50">
                 <td className="px-4 py-2 border-b text-center" onClick={() => handleImageClick(item)}>
                   {item.image ? (
