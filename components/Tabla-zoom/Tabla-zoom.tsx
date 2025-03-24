@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { format, addDays } from "date-fns";
 import { es } from "date-fns/locale";
-import { Reservation, Day } from './../Tabla/Reservation';
+import { Reservation, Day,BookingDetails } from './../Tabla/Reservation';
 import { Table } from '@/components/ui/table';
 import ReservaM from "../ReservaM/ReservaM";
 import ReservaEdit from "../ReservaEdit/ReservaEdit";
@@ -84,40 +84,56 @@ export default function Tabla({id, field, startDate, endDate, currentWeekStart, 
   
 
   const validStatuses = ["reservado", "en espera", "completado"];
+  let touchTimeout: NodeJS.Timeout | null = null;
 
   const activateContextMenu = (x: number, y: number, cellKey: string, status: string, id: string, iduser: string) => {
     if (!validStatuses.includes(status)) return;
-    console.log("bandera cambiada", status);
-
-    setband(true); // 🔹 Activa la bandera para todas las tablas
   
-    setSelectedCellcut((prev) => {
-      setCutCell(cellKey)
-      setfieldid(field)
-
-      console.log("bandera cambiada", id);
-      setuserid(iduser);
-      setbookingid(id);
-      if (prev?.key === cellKey && prev.status === status) return prev;
-      return { key: cellKey, status };
+    setband((prev) => {
+      console.log("bandera cortar 3 antes de cambiar:", prev);
+      return true;
     });
+  
+    setCutCell(cellKey);
+    setfieldid(field);
+    setuserid(iduser);
+    setbookingid(id);
+  
+    setSelectedCellcut((prev) =>
+      prev?.key === cellKey && prev.status === status ? prev : { key: cellKey, status }
+    );
+  
+    setTimeout(() => {
+      setband((prev) => {
+        console.log("bandera cortar 3 actualizada:", prev);
+        return prev;
+      });
+    }, 0);
   };
   
-  // 🔹 Evento para dispositivos táctiles
   const handleTouchStart = (event: React.TouchEvent, cellKey: string, status: string, id: string, iduser: string) => {
     const touch = event.touches[0];
-    setTimeout(() => activateContextMenu(touch.clientX, touch.clientY, cellKey, status, id, iduser), 500);
+  
+    touchTimeout = setTimeout(() => {
+      activateContextMenu(touch.clientX, touch.clientY, cellKey, status, id, iduser);
+    }, 1000);
   };
   
-  // 🔹 Evento para clic derecho
+  const handleTouchEnd = () => {
+    if (touchTimeout) {
+      clearTimeout(touchTimeout);
+      touchTimeout = null;
+    }
+  };
+  
   const handleContextMenu = (event: React.MouseEvent, cellKey: string, status: string, id: string, iduser: string) => {
     event.preventDefault();
     activateContextMenu(event.clientX, event.clientY, cellKey, status, id, iduser);
   };
   
-  useEffect(() => {
+ /* useEffect(() => {
     setfieldid(""); // ✅ Ahora se ejecuta solo después del render
-  }, []);
+  }, []);*/
 
   const handleCutClick = async (hour_start: string, hour_end: string, targetDay: string ,status:string) => {
     if(status=="disponible"){
@@ -194,7 +210,10 @@ setCutCell(null)
       console.log("📥 Respuesta de la API:", responseData);
   
       if (!response.ok) {
-        throw new Error(`❌ Error en la API: ${response.status} ${response.statusText}`);
+        Swal.fire({ title: "ERROR", text: responseData.message, icon: "error" });
+        setCutCell(null)
+        setband(false)            
+        return;
       }
   
       console.log("✅ Reserva actualizada exitosamente.");
@@ -207,7 +226,60 @@ setCutCell(null)
         console.log("🔄 Recargando tabla con fieldid:", fieldid);
         setRefreshTrigger(prev => prev + 1); // 🔄 Fuerza un re-render de la tabla
     }else{
-      fetchDatos()
+     // fetchDatos()
+     setReservations((prev) => {
+      let movedBooking: { details: BookingDetails | null; status: Day["status"] } = {
+          details: null,
+          status: "reservado",
+      };
+  
+      return prev
+          .map((reservation) => {
+              const bookingIdNumber = Number(bookingid);
+              console.log("📌 Buscando reserva con ID:", bookingIdNumber);
+  
+              // 1️⃣ Buscar la reserva y eliminarla del día original
+              const updatedDays: Day[] = reservation.days.map((day) => {
+                  if (day.booking_details?.id === bookingIdNumber) {
+                      console.log("✅ Reserva encontrada en el día:", day.day_name);
+  
+                      movedBooking.details = { ...day.booking_details };
+                      movedBooking.status = day.status;
+  
+                      return { 
+                          ...day, 
+                          booking_details: null,  
+                          status: "disponible",  
+                      };
+                  }
+                  return day;
+              });
+  
+              return { ...reservation, days: updatedDays };
+          })
+          .map((reservation) => {
+              // 2️⃣ Insertar la reserva en el nuevo horario y día correctos
+              if (
+                  reservation.hour_range.start === hour_start &&
+                  reservation.hour_range.end === hour_end &&
+                  movedBooking.details
+              ) {
+                  return {
+                      ...reservation,
+                      days: reservation.days.map((day) =>
+                          day.day_name === targetDay
+                              ? {
+                                    ...day,
+                                    status: movedBooking.status,
+                                    booking_details: movedBooking.details,
+                                }
+                              : day
+                      ),
+                  };
+              }
+              return reservation;
+          });
+  });
     }
     } catch (error) {
       console.error("❌ Error al actualizar la reserva:", error);
@@ -619,6 +691,7 @@ function formatHour(time: string) {
             <td
             key={dayIndex}
             onContextMenu={(e) => handleContextMenu(e, cellKey, status,idbooking,iduser)} // Convertir a string
+            onTouchEnd={handleTouchEnd} // Aquí cancelamos si suelta antes de 2 segundos
             onTouchStart={(e) => handleTouchStart(e, cellKey, status,idbooking,iduser)}
             onClick={() => {
               console.log("Click en celda:", cellKey);

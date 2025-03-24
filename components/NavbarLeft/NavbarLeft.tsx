@@ -16,13 +16,13 @@ export default function NavbarLeft() {
   };
 
   return (
-    <aside className="fixed top-0 -mt-4  sm:mt-0 left-0 h-[calc(100vh-48px)] w-75 sm:w-72 bg-white text-[#191D23] z-50 shadow-md flex flex-col justify-between overflow-auto">
+    <aside className="fixed top-0 -mt-4  sm:mt-0 left-0 h-screen max-h-screen w-64 sm:w-80 bg-white text-[#191D23] z-50 shadow-md flex flex-col justify-between overflow-auto">
       <nav className="p-2">
         <ul>
           {menuItems.map((item, index) => (
             <div key={index}>
               {item.type === "separator" && isOpen && (
-                <span className="px-4 text-gray-500 text-sm">{item.label}</span>
+                <span className="px-4 text-gray-500 text-xs sm:text-sm hidden lg:block">{item.label}</span>
               )}
               {item.type === "item" && (
                 <NavbarLeftItem label={item.label} icon={item.icon} link={item.link} />
@@ -43,7 +43,7 @@ export default function NavbarLeft() {
       <div className="py-3 px-2 flex items-center justify-center">
         <button
           onClick={handleLogout}
-          className="flex items-center justify-center mb-8 sm:mb-10 lg:mb-16 space-x-2 bg-red-500 text-white p-3 rounded-md hover:bg-red-600 transition duration-300 "
+          className="flex items-center justify-center mb-10 sm:mb-14 lg:mb-16 space-x-2 bg-red-500 text-white p-3 rounded-md hover:bg-red-600 transition duration-300 "
         >
           <LogOutIcon className="text-lg" />
           <span>Cerrar Sesión</span>

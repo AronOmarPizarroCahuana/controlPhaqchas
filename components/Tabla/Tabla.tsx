@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { format, addDays } from "date-fns";
 import { es } from "date-fns/locale";
-import { Reservation, Day} from './Reservation';
+import { Reservation, Day,BookingDetails} from './Reservation';
 import { Table } from '@/components/ui/table';
 import ReservaM from "../ReservaM/ReservaM";
 import ReservaEdit from "../ReservaEdit/ReservaEdit";
@@ -169,7 +169,7 @@ setCutCell(null)
     }
     const day=days[contador]
     console.log("📌 Datos recibidos:",status,bookingid,userid,targetDay,  hour_start, hour_end, day.toISOString().split('T')[0]);
-  
+  console.log("campo cortado",fieldid,"campo a pegar",field)
     if (band==false) {
       console.warn("⚠️ No hay reserva cortada, saliendo...");
       return;
@@ -198,7 +198,11 @@ setCutCell(null)
       console.log("📥 Respuesta de la API:", responseData);
   
       if (!response.ok) {
-        throw new Error(`❌ Error en la API: ${response.status} ${response.statusText}`);
+        Swal.fire({ title: "ERROR", text: responseData.message, icon: "error" });
+        setCutCell(null)
+        setband(false)
+
+        return;
       }
   
       console.log("✅ Reserva actualizada exitosamente.");
@@ -212,8 +216,63 @@ setCutCell(null)
         console.log("🔄 Recargando tabla con fieldid:", fieldid);
         setRefreshTrigger(prev => prev + 1); // 🔄 Fuerza un re-render de la tabla
     }else{
-      fetchDatos()
-    }
+
+  setReservations((prev) => {
+    let movedBooking: { details: BookingDetails | null; status: Day["status"] } = {
+        details: null,
+        status: "reservado",
+    };
+
+    return prev
+        .map((reservation) => {
+            const bookingIdNumber = Number(bookingid);
+            console.log("📌 Buscando reserva con ID:", bookingIdNumber);
+
+            // 1️⃣ Buscar la reserva y eliminarla del día original
+            const updatedDays: Day[] = reservation.days.map((day) => {
+                if (day.booking_details?.id === bookingIdNumber) {
+                    console.log("✅ Reserva encontrada en el día:", day.day_name);
+
+                    movedBooking.details = { ...day.booking_details };
+                    movedBooking.status = day.status;
+
+                    return { 
+                        ...day, 
+                        booking_details: null,  
+                        status: "disponible",  
+                    };
+                }
+                return day;
+            });
+
+            return { ...reservation, days: updatedDays };
+        })
+        .map((reservation) => {
+            // 2️⃣ Insertar la reserva en el nuevo horario y día correctos
+            if (
+                reservation.hour_range.start === hour_start &&
+                reservation.hour_range.end === hour_end &&
+                movedBooking.details
+            ) {
+                return {
+                    ...reservation,
+                    days: reservation.days.map((day) =>
+                        day.day_name === targetDay
+                            ? {
+                                  ...day,
+                                  status: movedBooking.status,
+                                  booking_details: movedBooking.details,
+                              }
+                            : day
+                    ),
+                };
+            }
+            return reservation;
+        });
+});
+
+
+   }
     } catch (error) {
       console.error("❌ Error al actualizar la reserva:", error);
     }
@@ -234,7 +293,7 @@ setCutCell(null)
   
   
   
-  
+
  
 
  
@@ -367,6 +426,10 @@ console.log(err)
     }
   };
 
+  useEffect(() => {
+    console.log("🚀 RefreshTrigger cambió, recargando datos...");
+    fetchDatos(); // Llama a la función que obtiene los datos
+}, [refreshTrigger]);
 
  
 

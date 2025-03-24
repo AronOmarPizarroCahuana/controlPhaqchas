@@ -26,7 +26,7 @@ export default function NavbarLeftGroup({
     <div className="w-full p-2">
       {/* Botón principal del grupo */}
       <span
-        className="w-full p-2 flex items-center justify-between py-4 transition-all text-md text-black/70 hover:cursor-pointer hover:text-purple-700 hover:bg-gray-300/80 rounded-lg"
+        className="w-full p-2 flex items-center justify-between py-4 transition-all text-xs sm:text-sm md:text-md lg:text-base xl:text-lg text-black/70 hover:cursor-pointer hover:text-purple-700 hover:bg-gray-300/80 rounded-lg h-10 sm:h-12 xl:h-16"
         onClick={onToggle} // Se encarga de manejar el estado desde el padre
       >
         <div className="flex items-center gap-x-4 pl-6">
@@ -45,7 +45,7 @@ export default function NavbarLeftGroup({
       {/* Lista de elementos del grupo */}
       <ul
         className={clsx(
-          "overflow-hidden transition-[max-height] duration-300 ease-in-out rounded-lg py-2 pl-4 relative",
+          "overflow-hidden transition-[max-height] duration-300 ease-in-out rounded-lg py-2 pl-4 relative ",
           isOpen ? "max-h-40" : "max-h-0"
         )}
       >
@@ -63,7 +63,7 @@ export default function NavbarLeftGroup({
             <Link
               href={item.link}
               className={clsx(
-                "w-full pl-10 text-black flex items-center gap-x-4 py-2 transition-all text-md font-light hover:text-purple-700 rounded-lg relative group",
+                "w-full pl-10 text-black flex items-center gap-x-4 py-2 transition-all text-xs sm:text-sm md:text-md lg:text-base xl:text-lg font-light hover:text-purple-700 rounded-lg relative group",
                 pathname === item.link && "text-purple-700 font-bold"
               )}
             >

@@ -55,7 +55,7 @@ export default function Booking() {
     <div className="py-[1px] px-[6px] sm:p-3 bg-[#EFEFEF] rounded-lg shadow-lg  ">
       
       <div className="space-y-4">
-      <div className="fixed bottom-5 left-1/2 top-1 -translate-x-1/2 z-50 sm:hidden">
+      <div className="fixed top-1 left-1/2  -translate-x-1/2 z-50 sm:hidden">
   <Link
     href="/AdminGestion/Reserva-zoom"
     className="bg-blue-600 text-white p-4 rounded-lg shadow-lg hover:bg-blue-700 transition flex items-center justify-center w-11 h-11"
