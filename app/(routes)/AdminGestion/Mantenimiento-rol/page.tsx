@@ -25,7 +25,7 @@ export default function FormPage() {
   }, []);
 
   useEffect(() => {
-    fetch(`${API_URL}/customer`) 
+    fetch(`${API_URL}/user`) 
       .then(response => response.json())
       .then(data => {
         if (Array.isArray(data?.data)) { 
@@ -42,7 +42,7 @@ export default function FormPage() {
   }, []);
 
   const fetchAdmins = () => {
-    fetch(`${API_URL}/customer`)
+    fetch(`${API_URL}/user`)
       .then((response) => response.json())
       .then((data) => {
         if (Array.isArray(data?.data)) {
