@@ -352,7 +352,7 @@ const handleComplete = async () => {
 
           <h3 className="text-xl font-bold mb-3">Reserva </h3>
           <p className="mb-2 sm:mb-3 text-[11px] sm:text-sm text-gray-600">Hora: {timeStart} - {timeEnd}</p>
-          <p className="mb-2 sm:mb-3 text-[11px] sm:text-sm text-gray-600">Día: {day.toDateString()}</p>
+          <p className="mb-2 sm:mb-3 text-[11px] sm:text-sm text-gray-600">Día: {day.toISOString().split('T')[0]}</p>
           <p className="mb-2 sm:mb-3 text-[11px] sm:text-sm text-gray-600">Precio de la cancha: {total}</p>
           <p className="mb-2 sm:mb-3 text-[11px] sm:text-sm text-gray-600">cancha: campo {field}</p>
 

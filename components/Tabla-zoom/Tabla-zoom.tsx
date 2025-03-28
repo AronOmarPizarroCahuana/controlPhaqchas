@@ -64,7 +64,7 @@ export default function Tabla({id, field, startDate, endDate, currentWeekStart, 
 
 
 
-  const [isCutting, setIsCutting] = useState(false);
+  const [isCutting] = useState(false);
   const [cutBookingId, setCutBookingId] = useState<string | null>(null); // Guarda el ID de la reserva cortada
 
   useEffect(() => {
@@ -152,6 +152,8 @@ export default function Tabla({id, field, startDate, endDate, currentWeekStart, 
     console.log("⏳ Iniciando handleCutClick...")
     let contador = 0;
 
+    console.log('Valor de selectedCellcut:', selectedCellcut);
+    console.log('Valor de selectedCellcut:', cutBookingId);
 
     //aca la condicion y que la tabla fieldid se reinicie
   
@@ -228,7 +230,7 @@ setCutCell(null)
     }else{
      // fetchDatos()
      setReservations((prev) => {
-      let movedBooking: { details: BookingDetails | null; status: Day["status"] } = {
+      const movedBooking: { details: BookingDetails | null; status: Day["status"] } = {
           details: null,
           status: "reservado",
       };

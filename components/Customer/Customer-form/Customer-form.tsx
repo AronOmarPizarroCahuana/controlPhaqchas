@@ -15,7 +15,6 @@ const AddCustomerModal: React.FC<CustomerFormProps> = ({ isOpen, onClose, onAddC
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [birthdate, setBirthdate] = useState('');
-  const [password, setPassword] = useState(''); // Nuevo estado para la contraseña
 
   // Estados de validación
   const [errors, setErrors] = useState({

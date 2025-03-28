@@ -79,8 +79,8 @@ export default function Page() {
       setNewRoleName("");
       setError("");
       fetchRoles();
-    } catch (error: any) {
-      console.error("Error al crear rol:", error.message);
+    } catch (error: unknown) {
+      console.error("Error al crear rol:", error);
       setError("Hubo un problema al crear el rol");
     }
   };
@@ -124,8 +124,8 @@ export default function Page() {
       setEditingRole(null);
       setEditError(""); 
       fetchRoles();
-    } catch (error: any) {
-      console.error("Error al actualizar rol:", error.message);
+    } catch (error: unknown) {
+      console.error("Error al actualizar rol:", error);
       setEditError("Hubo un problema al actualizar el rol"); 
     }
   };

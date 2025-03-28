@@ -6,7 +6,7 @@ interface Permissions {
     id: number;
     name: string;
   }
-export default function page() {
+export default function Page() {
     const [permissions, setPermissions] = useState<Permissions[]>([]);
     const [newPermissionName, setNewPermissionName] = useState("");
     const [error, setError] = useState("");
@@ -77,8 +77,8 @@ export default function page() {
         setNewPermissionName("");
         setError("");
         fetchPermissions();
-      } catch (error: any) {
-        console.error("Error al crear rol:", error.message);
+      } catch (error: unknown) {
+        console.error("Error al crear rol:", error);
         setError("Hubo un problema al crear el rol");
       }
     };
@@ -122,8 +122,8 @@ export default function page() {
         setEditingPermission(null);
         setEditError(""); 
         fetchPermissions();
-      } catch (error: any) {
-        console.error("Error al actualizar permiso:", error.message);
+      } catch (error: unknown) {
+        console.error("Error al actualizar permiso:", error);
         setEditError("Hubo un problema al actualizar el permiso"); 
       }
     };

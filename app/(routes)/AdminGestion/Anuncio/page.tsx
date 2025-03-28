@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { PublishedList} from "@/components/annoucementTable";
+
 import { PublishedItem } from "@/app/Interface/annoucement";
 import { AnnouncementForm } from "@/components/annoucementForm";
-import { PublishedList } from "@/components/annoucementTable";
+
 import { API_URL } from "../../../../config";
 
-export default function FormPage() {
+export default function Page() {
   const [publishedItems, setPublishedItems] = useState<PublishedItem[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -101,9 +103,8 @@ export default function FormPage() {
       <div className="w-full md:w-1/2 p-4 border-t md:border-l md:border-t-0 border-gray-300">
         <div className="overflow-x-auto max-h-[calc(100vh-250px)] md:max-h-[calc(100vh-200px)]">
           <PublishedList
-            publishedItems={publishedItems}
-            reloadAnnouncements={reloadAnnouncements}
-          />
+          publishedItems={publishedItems} 
+          reloadAnnouncements={reloadAnnouncements}/>
         </div>
       </div>
     </div>

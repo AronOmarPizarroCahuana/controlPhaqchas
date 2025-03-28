@@ -5,8 +5,7 @@ import { API_URL } from "../../../config";
 import { Admin } from "@/app/Interface/admin";
 import Swal from "sweetalert2";
 import { KeySquare, Pencil } from "lucide-react";
-import Switch from "@/components/Switch/Switch";
-import { permission } from "process";
+
 import ModalRoles from "../ModalRoles/ModalRoles";
 
 interface FieldProps {

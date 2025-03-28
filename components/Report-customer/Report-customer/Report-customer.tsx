@@ -1,5 +1,5 @@
 import { API_URL } from '@/config';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface Customer {
   id: number;

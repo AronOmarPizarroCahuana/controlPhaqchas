@@ -23,7 +23,7 @@ export default function ModalRoles({ adminId, onClose }: RolesModalProps) {
       .then((data) => setPermissions(data.data))
       .catch((err) => console.error("Error fetching roles:", err));
   }, []);
-
+/*
   useEffect(() => {
     if (adminId) {
       const rolesUrl = `${API_URL}/users/${adminId}/roles`;
@@ -55,7 +55,57 @@ export default function ModalRoles({ adminId, onClose }: RolesModalProps) {
           console.error("Error fetching user roles/permissions:", err)
         );
     }
+  }, [adminId]);*/
+
+  interface Role {
+    id: number;
+    name: string;
+  }
+  
+  interface Permission {
+    id: number;
+    name: string;
+  }
+  
+  
+  useEffect(() => {
+    if (adminId) {
+      const rolesUrl = `${API_URL}/users/${adminId}/roles`;
+      const permissionsUrl = `${API_URL}/users/${adminId}/permissions`;
+  
+      Promise.all([fetch(rolesUrl), fetch(permissionsUrl)])
+        .then(([rolesRes, permissionsRes]) =>
+          Promise.all([rolesRes.json(), permissionsRes.json()])
+        )
+        .then(([rolesData, permissionsData]) => {
+          console.log("Roles del usuario:", rolesData);
+          console.log("Permisos del usuario:", permissionsData);
+  
+          // Aserta el tipo de data a Role[] y Permission[]
+          const rolesArray = rolesData.data as Role[];
+          const permissionsArray = permissionsData.data as Permission[];
+  
+          // Reducir los roles sin usar any
+          const rolesMap = rolesArray.reduce<Record<string, boolean>>((acc, role) => {
+            acc[role.name] = true;
+            return acc;
+          }, {});
+  
+          // Reducir los permisos sin usar any
+          const permissionsMap = permissionsArray.reduce<Record<string, boolean>>((acc, perm) => {
+            acc[perm.name] = true;
+            return acc;
+          }, {});
+  
+          setUserRoles(rolesMap);
+          setUserPermissions(permissionsMap);
+        })
+        .catch((err) =>
+          console.error("Error fetching user roles/permissions:", err)
+        );
+    }
   }, [adminId]);
+  
 
   const handleRoleChange = (roleName: string) => {
     setUserRoles((prevRoles) => ({
@@ -91,7 +141,7 @@ export default function ModalRoles({ adminId, onClose }: RolesModalProps) {
         <div className="flex flex-col gap-y-2">
           <h2>Roles del sistema</h2>
           <div className="flex items-center gap-x-5">
-            {roles.map((role: any) => (
+            {roles.map((role: Role) => (
               <div key={role.id} className="flex items-center flex-col gap-x-4">
                 <Switch
                   id={role.id}
@@ -106,7 +156,7 @@ export default function ModalRoles({ adminId, onClose }: RolesModalProps) {
         <div className="flex flex-col gap-y-2">
           <h2>Permisos</h2>
           <div className="flex items-center gap-x-5">
-            {permissions.map((perm: any) => (
+            {permissions.map((perm: Permission) => (
               <div key={perm.id} className="flex items-center gap-x-4">
                 <Switch
                   id={perm.id}

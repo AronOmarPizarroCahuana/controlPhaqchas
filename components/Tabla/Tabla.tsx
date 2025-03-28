@@ -6,7 +6,7 @@ import { Table } from '@/components/ui/table';
 import ReservaM from "../ReservaM/ReservaM";
 import ReservaEdit from "../ReservaEdit/ReservaEdit";
 import {API_URL} from "../../config";
-import {  TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import {   TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import Swal from "sweetalert2";
 
@@ -41,11 +41,11 @@ export default function Tabla({ id, field, startDate, endDate, currentWeekStart,
     sport_id?:string;
 
   } | null>(null);
-  interface TargetCellData {
+  /*interface TargetCellData {
     startTime: string;
     endTime: string;
     day: Date;
-  }
+  }*/
   
   const [isModalOpenE, setIsModalOpenE] = useState(false);
   const [modalDataE, setModalDataE] = useState<{
@@ -79,7 +79,8 @@ export default function Tabla({ id, field, startDate, endDate, currentWeekStart,
 
   const activateContextMenu = (x: number, y: number, cellKey: string, status: string, id: string, iduser: string) => {
     if (!validStatuses.includes(status)) return;
-  
+    console.log('Valor de selectedCellcut:', selectedCellcut);
+
     setband((prev) => {
       console.log("bandera cortar 3 antes de cambiar:", prev);
       return true;
@@ -218,7 +219,7 @@ setCutCell(null)
     }else{
 
   setReservations((prev) => {
-    let movedBooking: { details: BookingDetails | null; status: Day["status"] } = {
+    const movedBooking: { details: BookingDetails | null; status: Day["status"] } = {
         details: null,
         status: "reservado",
     };
