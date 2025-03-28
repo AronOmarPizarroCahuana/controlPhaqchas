@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Customer } from "@/app/Interface/customer";
+import { API_URL } from '@/config';
 
 interface CustomerFormProps {
   isOpen: boolean;
@@ -24,7 +25,6 @@ const AddCustomerModal: React.FC<CustomerFormProps> = ({ isOpen, onClose, onAddC
     phone: '',
     address: '',
     birthdate: '',
-    password: '', // Nuevo campo de validación para la contraseña
   });
 
   const validateForm = () => {
@@ -35,7 +35,6 @@ const AddCustomerModal: React.FC<CustomerFormProps> = ({ isOpen, onClose, onAddC
       phone: validatePhone(phone) ? '' : 'Teléfono inválido. Debe ser un número válido.',
       address: address ? '' : 'Dirección es requerida.',
       birthdate: birthdate ? '' : 'Fecha de nacimiento es requerida.',
-      password: password.length >= 8 ? '' : 'La contraseña debe tener al menos 6 caracteres.', // Validación de contraseña
     };
     setErrors(newErrors);
 
@@ -65,11 +64,10 @@ const AddCustomerModal: React.FC<CustomerFormProps> = ({ isOpen, onClose, onAddC
       phone,
       address,
       birthdate,
-      password, // Incluir la contraseña en los datos del cliente
     };
 
     try {
-      const response = await fetch('https://api.dev.phaqchas.com/public/api/auth/register', {
+      const response = await fetch(`${API_URL}/user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,12 +78,15 @@ const AddCustomerModal: React.FC<CustomerFormProps> = ({ isOpen, onClose, onAddC
 
       if (response.ok) {
         console.log('Cliente agregado', response);
+        console.log("cliente enviado",customerData)
+
         onClose(); // Cierra el modal
         if(onAddCustomer != null){
           onAddCustomer(customerData)
         }
       
       } else {
+        console.log("cliente enviado",customerData)
         const errorDetails = await response.json();
         console.error('Detalles del error:', errorDetails);
         throw new Error('Error al agregar cliente');

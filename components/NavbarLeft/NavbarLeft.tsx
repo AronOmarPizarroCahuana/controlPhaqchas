@@ -4,12 +4,20 @@ import NavbarLeftItem from "../NavbarLeftItem/NavbarLeftItem";
 import NavbarLeftGroup from "../NavbarLeftGroup/NavbarLeftGroup";
 import { menuItems } from "./NavbarLetf.data";
 import { Link, LogOut, LogOutIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function NavbarLeft() {
   const [isOpen, setIsOpen] = useState(true);
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
+  const router = useRouter();
+
   const pathname = usePathname();
-  const handleLogout = () => {};
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("roles");
+    router.push("/");
+
+  };
 
   const handleToggle = (groupLabel: string) => {
     setActiveGroup((prev) => (prev === groupLabel ? null : groupLabel));

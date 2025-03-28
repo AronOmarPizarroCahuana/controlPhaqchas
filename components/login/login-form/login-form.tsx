@@ -54,9 +54,9 @@ export default function Login() {
       const user = await userResponse.json();
       console.log(user);
 
-      if (user.roles.includes("admin")) {
+      if (user.roles.includes("Administrador") ||user.roles.includes("trabajador") ) {
         localStorage.setItem("authToken", data.access_token);
-        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("roles", JSON.stringify(user.roles));
 
         Swal.fire({ title: "Bienvenido!", text: "Acceso concedido", icon: "success" });
         router.push("/AdminGestion");
