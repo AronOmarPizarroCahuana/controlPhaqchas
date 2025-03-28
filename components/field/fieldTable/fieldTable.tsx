@@ -8,13 +8,12 @@ import {API_URL} from "../../../config";
 import {API_URL_BASE} from "../../../config";
 import { Label } from "@/components/ui/label";
 
-interface FieldProps {
-    FieldItems: Field[];
-}
+
 interface AnnouncementFormProps {
-  reloadAnnouncements: () => void; 
+  FieldItems: Field[];
+  reloadAnnouncements?: () => void; 
 }
-export function PublishedList({ FieldItems,reloadAnnouncements }: FieldProps & AnnouncementFormProps) {
+export function PublishedList({ FieldItems,reloadAnnouncements }: AnnouncementFormProps) {
  // const [items, setItems] = useState<Field[]>(FieldItems);
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState<Field | null>(null);
@@ -52,7 +51,7 @@ export function PublishedList({ FieldItems,reloadAnnouncements }: FieldProps & A
       if (!response.ok) throw new Error("Error al actualizar la imagen");
   
       // Recargar la tabla de anuncios
-      reloadAnnouncements(); // Llamar a la función que recarga la tabla de anuncios
+      reloadAnnouncements?.(); // Llamar a la función que recarga la tabla de anuncios
   
       // Limpiar los datos del formulario
       setSelectedItem(null);
@@ -85,7 +84,7 @@ export function PublishedList({ FieldItems,reloadAnnouncements }: FieldProps & A
 
       if (!response.ok) throw new Error("Error al actualizar el estado");
 
-      reloadAnnouncements();
+      reloadAnnouncements?.();
       
     } catch (error) {
       console.error("Error al actualizar el estado:", error);
@@ -105,7 +104,7 @@ export function PublishedList({ FieldItems,reloadAnnouncements }: FieldProps & A
     })
       .then((response) => {
         if (response.ok) {
-          reloadAnnouncements()        }
+          reloadAnnouncements?.()        }
            else {
           console.error("Error al eliminar el anuncio");
         }
@@ -125,7 +124,7 @@ export function PublishedList({ FieldItems,reloadAnnouncements }: FieldProps & A
     })
       .then((response) => {
         if (response.ok) {
-          reloadAnnouncements()
+          reloadAnnouncements?.()
           console.log(response)
           setShowModal(false); 
         } else {

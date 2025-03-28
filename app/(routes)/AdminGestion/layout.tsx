@@ -1,4 +1,4 @@
-"use client"; // Necesario porque usamos useEffect y useState
+"use client"; 
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -13,15 +13,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     const token = localStorage.getItem("authToken");
     const roles = JSON.parse(localStorage.getItem("roles") || "[]");
 
-    // Permitir solo la página "/reserva"
     if (pathname !== "/AdminGestion" && (!token || !roles.includes("Administrador"))) {
-      router.push("/AdminGestion"); // Redirigir a "/reserva"
+      router.push("/AdminGestion");
     } else {
       setIsAuthorized(true);
     }
-  }, [pathname]);
+  }, [pathname, router]);
 
-  if (!isAuthorized) return null; // Evita mostrar la app mientras se valida el acceso
+  if (!isAuthorized) return null; 
 
   return (
     <div className="min-h-screen flex flex-col">

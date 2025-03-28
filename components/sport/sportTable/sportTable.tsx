@@ -12,7 +12,7 @@ interface PublishedListProps {
   publishedItems: Sport[];
 }
 interface AnnouncementFormProps {
-  reloadAnnouncements: () => void; 
+  reloadAnnouncements?: () => void; 
 }
 export function PublishedList({ publishedItems ,reloadAnnouncements}: PublishedListProps & AnnouncementFormProps) {
   //const [items, setItems] = useState<Sport[]>(publishedItems);
@@ -50,7 +50,7 @@ export function PublishedList({ publishedItems ,reloadAnnouncements}: PublishedL
       if (!response.ok) throw new Error("Error al actualizar la imagen");
   
       // Recargar la tabla de anuncios
-      reloadAnnouncements(); // Llamar a la función que recarga la tabla de anuncios
+      reloadAnnouncements?.(); // Llamar a la función que recarga la tabla de anuncios
   
       // Limpiar los datos del formulario
       setSelectedItem(null);
@@ -87,7 +87,7 @@ export function PublishedList({ publishedItems ,reloadAnnouncements}: PublishedL
     })
       .then((response) => {
         if (response.ok) {
-          reloadAnnouncements();
+          reloadAnnouncements?.();
         } else {
           console.error("Error al eliminar el deporte");
         }
@@ -110,7 +110,7 @@ export function PublishedList({ publishedItems ,reloadAnnouncements}: PublishedL
     })
       .then((response) => {
         if (response.ok) {
-          reloadAnnouncements();
+          reloadAnnouncements?.();
           console.log(updatedItem)
           setShowModal(false); // Cerrar el modal después de actualizar
         } else {

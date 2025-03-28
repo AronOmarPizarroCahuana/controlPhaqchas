@@ -16,9 +16,10 @@ export default function ReporMes({ meses, año }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const API_URLC = `${API_URL}/bookingsForAdmiMonth/${meses}/${año}`;
+  
 
   useEffect(() => {
+    const API_URLC = `${API_URL}/bookingsForAdmiMonth/${meses}/${año}`;
     async function fetchData() {
       try {
         const response = await fetch(API_URLC);
@@ -44,7 +45,7 @@ export default function ReporMes({ meses, año }: Props) {
  
 
     fetchData();
-  }, [año]); // Se ejecuta cada vez que cambie el año
+  }, [meses, año]); // Se ejecuta cada vez que cambie el año
 
   if (loading) {
     return <p className="text-center mt-10">Cargando datos...</p>;
@@ -75,7 +76,7 @@ export default function ReporMes({ meses, año }: Props) {
         const blob = await response.blob();
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `Reporte_${obtenerMes(meses)}_${año}.pdf`;
+        link.download = `Reporte_${obtenerMes(meses).join(", ")}_${año}.pdf`;
         link.click();
       } else {
         console.error("Error al generar el PDF");

@@ -9,14 +9,11 @@ import { Label } from "@/components/ui/label";
 import {API_URL_BASE} from "../../config";
 
 interface PublishedListProps {
-  publishedItems: PublishedItem[];
-}
-interface AnnouncementFormProps {
-  reloadAnnouncements: () => void; // Cambiar addPublishedItem por reloadAnnouncements
+    publishedItems: PublishedItem[];
+    reloadAnnouncements?: () => void;
 }
 
-
-export function PublishedList({ publishedItems, reloadAnnouncements }: PublishedListProps & AnnouncementFormProps) {
+export function PublishedList({ publishedItems, reloadAnnouncements }: PublishedListProps) { 
   //const [items, setItems] = useState<PublishedItem[]>(publishedItems);
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState<PublishedItem | null>(null);
@@ -62,7 +59,7 @@ export function PublishedList({ publishedItems, reloadAnnouncements }: Published
       if (!response.ok) throw new Error("Error al actualizar la imagen");
   
       // Recargar la tabla de anuncios
-      reloadAnnouncements(); // Llamar a la función que recarga la tabla de anuncios
+      reloadAnnouncements?.(); // Llamar a la función que recarga la tabla de anuncios
   
       // Limpiar los datos del formulario
       setSelectedItem(null);
@@ -70,10 +67,12 @@ export function PublishedList({ publishedItems, reloadAnnouncements }: Published
       setPreview(null);
   
       alert("Imagen actualizada correctamente");
-    } catch (error) {
+    } catch (error: unknown) {
+     if(error instanceof Error){
       console.error("Error al actualizar la imagen:", error);
       
       alert("Ocurrió un error al actualizar la imagen.");
+     }
     }
   };
   
@@ -96,7 +95,7 @@ export function PublishedList({ publishedItems, reloadAnnouncements }: Published
       .then((response) => {
         if (response.ok) {
           console.log("Eliminación exitosa", response);
-          reloadAnnouncements(); // 🔄 Recargar la tabla con los datos actualizados
+          reloadAnnouncements?.(); // 🔄 Recargar la tabla con los datos actualizados
         } else {
           console.error("Error al eliminar el anuncio");
         }
@@ -115,7 +114,7 @@ export function PublishedList({ publishedItems, reloadAnnouncements }: Published
       if (!response.ok) throw new Error("Error al actualizar el estado");
   
       console.log("Estado actualizado con éxito");
-      reloadAnnouncements(); // 🔄 Recargar la lista desde la API
+      reloadAnnouncements?.(); // 🔄 Recargar la lista desde la API
     } catch (error) {
       console.error("Error al actualizar el estado:", error);
     }
@@ -136,7 +135,7 @@ export function PublishedList({ publishedItems, reloadAnnouncements }: Published
       .then((response) => {
         if (response.ok) {
           console.log("Actualización exitosa", response);
-          reloadAnnouncements(); // 🔄 Recargar la tabla con los datos actualizados
+          reloadAnnouncements?.(); // 🔄 Recargar la tabla con los datos actualizados
           setShowModal(false); // Cerrar el modal después de actualizar
         } else {
           console.error("Error al actualizar el anuncio");
