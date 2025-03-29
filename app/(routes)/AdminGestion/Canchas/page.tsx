@@ -86,14 +86,14 @@ export default function FormPage() {
                   </button>
               
                   <h2 className="text-xl font-bold mb-10">Nueva cancha</h2>
-                  <AnnouncementForm reloadAnnouncements={reloadAnnouncements} />
+                  <AnnouncementForm reloadAnnouncements={reloadAnnouncements} setIsModalOpen={setIsModalOpen} />
                 </div>
               </div>
             )}
           </>
         ) : (
           // Si no es móvil, mostrar el formulario normalmente
-          <AnnouncementForm reloadAnnouncements={reloadAnnouncements} />
+          <AnnouncementForm reloadAnnouncements={reloadAnnouncements} setIsModalOpen={setIsModalOpen} />
         )}
       </div>
 

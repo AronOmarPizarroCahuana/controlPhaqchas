@@ -89,7 +89,8 @@ export default function Page() {
                   </button>
 
                   <h2 className="text-xl font-bold mb-10">Nuevo Anuncio</h2>
-                  <AnnouncementForm reloadAnnouncements={reloadAnnouncements} />
+                  <AnnouncementForm reloadAnnouncements={reloadAnnouncements}  setIsModalOpen={setIsModalOpen}
+/>
                 </div>
               </div>
             )}

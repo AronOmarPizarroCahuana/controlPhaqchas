@@ -8,9 +8,11 @@ import Image from "next/image";
 import {API_URL} from "../../../config";
 interface AnnouncementFormProps {
   reloadAnnouncements: () => void; // Cambiar addPublishedItem por reloadAnnouncements
+  setIsModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+
 }
 
-export function AnnouncementForm({ reloadAnnouncements }: AnnouncementFormProps) {
+export function AnnouncementForm({ reloadAnnouncements,setIsModalOpen }: AnnouncementFormProps) {
   const [formData, setFormData] = useState<Sport>({
     name: "",
     description: "",
@@ -49,7 +51,9 @@ export function AnnouncementForm({ reloadAnnouncements }: AnnouncementFormProps)
   
         // Recargar anuncios después de publicar
         reloadAnnouncements();
-  
+        if(setIsModalOpen){
+        setIsModalOpen(false);
+        }
         console.log("Deporte enviado:", { ...formData, id: result.id, imageUrl });
   
         // Limpiar el formulario

@@ -6,11 +6,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Field } from "@/app/Interface/field";
 import Image from "next/image";
 import {API_URL} from "../../../config";
-interface AnnouncementFormProps {
+interface FieldFormProps {
   reloadAnnouncements: () => void; // Cambiar addPublishedItem por reloadAnnouncements
+  setIsModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+
 }
 
-export function AnnouncementForm({ reloadAnnouncements }: AnnouncementFormProps) {
+export function AnnouncementForm({ reloadAnnouncements,setIsModalOpen}: FieldFormProps) {
   const [formData, setFormData] = useState<Field>({
     name: "",
     description: "",
@@ -41,7 +43,9 @@ export function AnnouncementForm({ reloadAnnouncements }: AnnouncementFormProps)
 
         // Recargar anuncios después de publicar
         reloadAnnouncements(); // Llamar a la función para recargar la tabla
-
+        if(setIsModalOpen){
+        setIsModalOpen(false);
+      }
         console.log("Anuncio enviado:", { ...formData, id: result.id, imageUrl });
 
         setFormData({ name: "", description: "", image: null, status: true });

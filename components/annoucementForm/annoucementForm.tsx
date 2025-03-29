@@ -6,12 +6,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { PublishedItem } from "@/app/Interface/annoucement";
 import Image from "next/image";
 import { API_URL } from "../../config";
-interface AnnouncementFormProps {
+interface AnnouncementFormProp {
   reloadAnnouncements: () => void; // Cambiar addPublishedItem por reloadAnnouncements
+  setIsModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
 export function AnnouncementForm({
-  reloadAnnouncements,
-}: AnnouncementFormProps) {
+  reloadAnnouncements,setIsModalOpen
+}: AnnouncementFormProp) {
   const [formData, setFormData] = useState<PublishedItem>({
     title: "",
     description: "",
@@ -42,7 +44,9 @@ export function AnnouncementForm({
 
         // Recargar anuncios después de publicar
         reloadAnnouncements(); // Llamar a la función para recargar la tabla
-
+        if (setIsModalOpen) {
+          setIsModalOpen(false);
+        }        
         console.log("Anuncio enviado:", {
           ...formData,
           id: result.id,
