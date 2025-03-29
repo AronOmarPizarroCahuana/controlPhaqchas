@@ -9,7 +9,6 @@ import { API_URL } from "../../config";
 interface AnnouncementFormProps {
   reloadAnnouncements: () => void; // Cambiar addPublishedItem por reloadAnnouncements
 }
-
 export function AnnouncementForm({
   reloadAnnouncements,
 }: AnnouncementFormProps) {
@@ -20,25 +19,21 @@ export function AnnouncementForm({
     status: true,
   });
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const data = new FormData();
-    if (formData.title) {
-      data.append("title", formData.title);
-    }
-    if (formData.description) {
-      data.append("description", formData.description);
-    }
+    const dato = new FormData();
+   
+      dato.append("title", formData.title); 
+      dato.append("description", formData.description);
+    
     if (formData.image) {
-      data.append("image", formData.image);
+      dato.append("image", formData.image);
     }
 
     try {
       const response = await fetch(`${API_URL}/announcement`, {
         method: "POST",
-        body: data,
+        body: dato,
       });
 
       if (response.ok) {
