@@ -28,6 +28,15 @@ export default function NavbarTop() {
   return (
     <nav className="top-0 left-0 fixed w-full h-12 flex items-center px-4 bg-white z-50 sm:h-16">
       <div className="flex items-center mt-2 sm:mt-0">
+         {/* Botón de cerrar sesión en móviles (icono) */}
+      {!isAdmin && (
+        <button 
+          onClick={handleLogout} 
+          className="mr-auto text-red-500 sm:hidden"
+        >
+          <FiLogOut size={24} /> {/* Icono de logout */}
+        </button>
+      )}
         {isAdmin ? (
           <Menu /> // Muestra el menú si es Administrador
         ) : (
@@ -45,15 +54,7 @@ export default function NavbarTop() {
         <Logo />
       </div>
 
-      {/* Botón de cerrar sesión en móviles (icono) */}
-      {!isAdmin && (
-        <button 
-          onClick={handleLogout} 
-          className="ml-auto text-red-500 sm:hidden"
-        >
-          <FiLogOut size={24} /> {/* Icono de logout */}
-        </button>
-      )}
+     
     </nav>
   );
 }

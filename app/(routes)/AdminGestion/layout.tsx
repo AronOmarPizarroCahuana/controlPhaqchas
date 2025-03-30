@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     const token = localStorage.getItem("authToken");
     const roles = JSON.parse(localStorage.getItem("roles") || "[]");
 
-    if (pathname !== "/AdminGestion" && (!token || !roles.includes("Administrador"))) {
+    if (pathname !== "/AdminGestion" && pathname !== "/AdminGestion/Reserva-zoom" && (!token || !roles.includes("Administrador"))) {
       router.push("/AdminGestion");
     } else {
       setIsAuthorized(true);
