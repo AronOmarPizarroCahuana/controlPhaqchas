@@ -50,6 +50,8 @@ export default function ReservaM({
 }: ReservaMProps) {
   const [user_id, setUser_id] = useState(initialData.user_id);
   const [yape, setYape] = useState(initialData.yape);
+  const [efectivo, setEfectivo] = useState(0);
+
   const [sports, setSports] = useState<Sport[]>([]);
   const [total, setTotal] = useState(0); // Estado para el total
   const [phoneError, setPhoneError] = useState("");
@@ -274,10 +276,10 @@ export default function ReservaM({
       booking_date: day.toISOString().split("T")[0],
       start_time: start_time ?? "",
       end_time: end_time ?? "",
-      price: 0,
+      price: efectivo,
       yape: yape,
       sport_id: selectedSportId ?? 1,
-      total: price + yape,
+      total: price + yape+ efectivo,
     };
     console.log(requestData);
 
@@ -435,9 +437,30 @@ export default function ReservaM({
                 type="number"
                 min="0"
                 max={price}
-                className="mt-1 p-2 w-48"
+                className="mt-1 p-2 w-20 sm:w-25 md:w-30 lg:w-35 xl:w-40"
               />
             </div>
+            <div>
+              <label
+                htmlFor="yape"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Efectivo
+              </label>
+              <Input
+                id="efectivo"
+                value={efectivo}
+                onChange={(e) => {
+                  const newefectivo = Number(e.target.value); // Convierte el valor a número
+                  setEfectivo(newefectivo);
+                }}
+                type="number"
+                min={0}
+                max={price}
+                className="mt-1 p-2 w-20 sm:w-25 md:w-30 lg:w-35 xl:w-40"
+              />
+            </div>
+
 
             <div>
               <label className="block text-sm font-medium text-gray-700">

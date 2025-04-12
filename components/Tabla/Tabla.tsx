@@ -115,7 +115,6 @@ export default function Tabla({
     setfieldid(field);
     setuserid(iduser);
     setbookingid(id);
-
     setSelectedCellcut((prev) =>
       prev?.key === cellKey && prev.status === status
         ? prev
@@ -703,6 +702,8 @@ useEffect(() => {
                   <span>Reserva</span>
                   <span>Yape</span>
                   <span>Precio</span>
+                  <span>Total</span>
+
                 </div>
               </th>
             ))}
@@ -790,6 +791,7 @@ useEffect(() => {
                         <span>{day.booking_details.user_name}</span>
                         <span>{day.booking_details.yape}</span>
                         <span>{day.booking_details.price}</span>
+                        <span>{day.booking_details.total}</span>
                       </div>
                     ) : (
                       <div className="text-center">Disponible</div>

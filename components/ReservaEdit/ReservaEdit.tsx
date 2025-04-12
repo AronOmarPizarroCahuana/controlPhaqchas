@@ -53,6 +53,7 @@ export default function ReservaM({
   const [total, setTotal] = useState(0);
   const [price, setPrice] = useState(0);
   const [phoneError, setPhoneError] = useState("");
+  const [efectivo, setEfectivo] = useState(0);
 
   //const [booking_id, setbooking_id] = useState(initialData.booking_id);
   const formatTime = (time: string) => {
@@ -481,7 +482,28 @@ export default function ReservaM({
                 min={initialData.yape}
                 max={price}
                 type="number"
-                className="mt-1 p-2 w-48"
+                className="mt-1 p-2 w-20 sm:w-25 md:w-30 lg:w-35 xl:w-40"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="yape"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Efectivo
+              </label>
+              <Input
+                id="efectivo"
+                value={efectivo}
+                onChange={(e) => {
+                  const newefectivo = Number(e.target.value); // Convierte el valor a número
+                  setEfectivo(newefectivo);
+                }}
+                type="number"
+                min={0}
+                max={price}
+                className="mt-1 p-2 w-20 sm:w-25 md:w-30 lg:w-35 xl:w-40"
               />
             </div>
 

@@ -14,7 +14,7 @@ const AddCustomerModal: React.FC<CustomerFormProps> = ({ isOpen, onClose, onAddC
   const [dni, setDni] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
-  const [birthdate, setBirthdate] = useState('');
+  const [birth_date, setBirthdate] = useState('');
 
   // Estados de validación
   const [errors, setErrors] = useState({
@@ -23,7 +23,7 @@ const AddCustomerModal: React.FC<CustomerFormProps> = ({ isOpen, onClose, onAddC
     dni: '',
     phone: '',
     address: '',
-    birthdate: '',
+    birth_date: '',
   });
 
   const validateForm = () => {
@@ -33,7 +33,7 @@ const AddCustomerModal: React.FC<CustomerFormProps> = ({ isOpen, onClose, onAddC
       dni: validateDni(dni) ? '' : 'DNI inválido. Debe ser un número de 8 dígitos.',
       phone: validatePhone(phone) ? '' : 'Teléfono inválido. Debe ser un número válido.',
       address: address ? '' : 'Dirección es requerida.',
-      birthdate: birthdate ? '' : 'Fecha de nacimiento es requerida.',
+      birth_date: birth_date ? '' : 'Fecha de nacimiento es requerida.',
     };
     setErrors(newErrors);
 
@@ -62,7 +62,7 @@ const AddCustomerModal: React.FC<CustomerFormProps> = ({ isOpen, onClose, onAddC
       dni,
       phone,
       address,
-      birthdate,
+      birth_date,
     };
 
     try {
@@ -78,7 +78,20 @@ const AddCustomerModal: React.FC<CustomerFormProps> = ({ isOpen, onClose, onAddC
       if (response.ok) {
         console.log('Cliente agregado', response);
         console.log("cliente enviado",customerData)
-
+        setName('');
+        setSurname('');
+        setDni('');
+        setPhone('');
+        setAddress('');
+        setBirthdate('');
+        setErrors({
+          name: '',
+          surname: '',
+          dni: '',
+          phone: '',
+          address: '',
+          birth_date: '',
+        });
         onClose(); // Cierra el modal
         if(onAddCustomer != null){
           onAddCustomer(customerData)
@@ -179,14 +192,12 @@ const AddCustomerModal: React.FC<CustomerFormProps> = ({ isOpen, onClose, onAddC
             <input
               type="date"
               id="birthdate"
-              value={birthdate}
+              value={birth_date}
               onChange={(e) => setBirthdate(e.target.value)}
               className="mt-1 block h-8 lg:h-10 lg:w-full p-2 border border-gray-300 rounded-md"
             />
-            {errors.birthdate && <p className="text-red-500 text-sm mt-1">{errors.birthdate}</p>}
+            {errors.birth_date && <p className="text-red-500 text-sm mt-1">{errors.birth_date}</p>}
           </div>
-
-        
 
           <div className="mb-1 lg:mb-4 mt-3 lg:mt-6"> 
           <button

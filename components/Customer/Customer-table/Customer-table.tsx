@@ -87,6 +87,7 @@ export default function ClientTable() {
             <tr className="bg-gray-100">
               <th className="p-2">Nombres y Apellidos</th>
               <th className="p-2">Número de Celular</th>
+              <th className="p-2">Fecha Nacimiento</th>
               <th className="p-2">Acciones</th>
             </tr>
           </thead>
@@ -104,8 +105,9 @@ export default function ClientTable() {
                     </div>
                   </td>
                   <td className="p-2">{client.phone}</td>
+                  <td className="p-2">{client.birth_date}</td>
                   <td className="p-2 space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">
-                    <button  onClick={() => setSelectedClient(client)} // Establecer el cliente seleccionado
+                    <button  onClick={() => setSelectedClient(client)} 
                       className="bg-blue-500 text-white p-2 rounded flex items-center justify-center md:px-3 md:py-1"
                     >
                       <span className="md:hidden"><Pencil size={16} /></span>
